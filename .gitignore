@@ -1,0 +1,13 @@
+blib/
+*.bak
+pm_to_blib
+Makefile
+MYMETA.json
+MYMETA.yml
+*.tar.gz
+*.tar
+perl.bak
+perlbak
+*.tdy
+*.swp
+docs/ai
