@@ -495,11 +495,13 @@ sub _find_shb_file
     }
 
     # Search built-in share directory via File::ShareDir
+    my $found;
     eval {
         my $share_dir = dist_dir('Syntax-Highlight-Basic');
         my $path = File::Spec->catfile($share_dir, 'syntax', $filename);
-        return $path if -f $path;
+        $found = $path if -f $path;
     };
+    return $found if defined $found;
 
     # Development fallback: search relative to this file
     my $dev_dir = _find_dev_share_dir();
@@ -597,11 +599,13 @@ sub _resolve_pygments_name
 sub _find_pygments_map
 {
     # Search built-in share directory via File::ShareDir
+    my $found;
     eval {
         my $share_dir = dist_dir('Syntax-Highlight-Basic');
         my $path = File::Spec->catfile($share_dir, 'pygments-languages.txt');
-        return $path if -f $path;
+        $found = $path if -f $path;
     };
+    return $found if defined $found;
 
     # Development fallback
     my $dir = dirname(__FILE__);
