@@ -9,43 +9,45 @@ use warnings;
 #===========================================================================
 
 my %ANSI_COLORS = (
-    # Sub-groups
-    'String'         => { color => 67,  bold => 0 },    # blue-ish
-    'Character'      => { color => 67,  bold => 0 },
-    'Number'         => { color => 71,  bold => 0 },    # green-ish
-    'Boolean'        => { color => 28,  bold => 1 },    # green bold
-    'Float'          => { color => 71,  bold => 0 },
-    'Function'       => { color => 33,  bold => 0 },    # light blue
-    'Conditional'    => { color => 28,  bold => 1 },    # green bold
-    'Repeat'         => { color => 28,  bold => 1 },
-    'Label'          => { color => 136, bold => 0 },    # olive
-    'Operator'       => { color => 102, bold => 0 },    # gray
-    'Keyword'        => { color => 28,  bold => 1 },
-    'Exception'      => { color => 28,  bold => 1 },
-    'Include'        => { color => 130, bold => 0 },    # brown
-    'Define'         => { color => 130, bold => 0 },
-    'Macro'          => { color => 130, bold => 0 },
-    'PreCondit'      => { color => 130, bold => 0 },
-    'StorageClass'   => { color => 28,  bold => 1 },
-    'Structure'      => { color => 28,  bold => 1 },
-    'Typedef'        => { color => 28,  bold => 1 },
-    'Tag'            => { color => 28,  bold => 1 },
-    'SpecialChar'    => { color => 130, bold => 1 },    # brown bold
-    'Delimiter'      => { color => 102, bold => 0 },
-    'SpecialComment' => { color => 160, bold => 1 },    # red bold
-    'Debug'          => { color => 160, bold => 1 },
-    # Parent groups
-    'Comment'        => { color => 73,  bold => 0 },    # teal
-    'Constant'       => { color => 71,  bold => 0 },
-    'Identifier'     => { color => 33,  bold => 0 },    # light blue
-    'Statement'      => { color => 28,  bold => 1 },
-    'PreProc'        => { color => 130, bold => 0 },
-    'Type'           => { color => 88,  bold => 0 },    # dark red
-    'Special'        => { color => 67,  bold => 0 },
-    'Underlined'     => { color => 4,   bold => 0 },    # blue
-    'Error'          => { color => 196, bold => 0 },    # bright red
-    'Todo'           => { color => 73,  bold => 0 },
-);
+
+   # Sub-groups
+   'String'         => {color => 67,  bold => 0},    # blue-ish
+   'Character'      => {color => 67,  bold => 0},
+   'Number'         => {color => 71,  bold => 0},    # green-ish
+   'Boolean'        => {color => 28,  bold => 1},    # green bold
+   'Float'          => {color => 71,  bold => 0},
+   'Function'       => {color => 33,  bold => 0},    # light blue
+   'Conditional'    => {color => 28,  bold => 1},    # green bold
+   'Repeat'         => {color => 28,  bold => 1},
+   'Label'          => {color => 136, bold => 0},    # olive
+   'Operator'       => {color => 102, bold => 0},    # gray
+   'Keyword'        => {color => 28,  bold => 1},
+   'Exception'      => {color => 28,  bold => 1},
+   'Include'        => {color => 130, bold => 0},    # brown
+   'Define'         => {color => 130, bold => 0},
+   'Macro'          => {color => 130, bold => 0},
+   'PreCondit'      => {color => 130, bold => 0},
+   'StorageClass'   => {color => 28,  bold => 1},
+   'Structure'      => {color => 28,  bold => 1},
+   'Typedef'        => {color => 28,  bold => 1},
+   'Tag'            => {color => 28,  bold => 1},
+   'SpecialChar'    => {color => 130, bold => 1},    # brown bold
+   'Delimiter'      => {color => 102, bold => 0},
+   'SpecialComment' => {color => 160, bold => 1},    # red bold
+   'Debug'          => {color => 160, bold => 1},
+
+   # Parent groups
+   'Comment'    => {color => 73,  bold => 0},        # teal
+   'Constant'   => {color => 71,  bold => 0},
+   'Identifier' => {color => 33,  bold => 0},        # light blue
+   'Statement'  => {color => 28,  bold => 1},
+   'PreProc'    => {color => 130, bold => 0},
+   'Type'       => {color => 88,  bold => 0},        # dark red
+   'Special'    => {color => 67,  bold => 0},
+   'Underlined' => {color => 4,   bold => 0},        # blue
+   'Error'      => {color => 196, bold => 0},        # bright red
+   'Todo'       => {color => 73,  bold => 0},
+   );
 
 #===========================================================================
 # Constructor
@@ -53,23 +55,21 @@ my %ANSI_COLORS = (
 
 sub new
 {
-    my ($class, %opts) = @_;
+   my ($class, %opts) = @_;
 
-    my %colors = %ANSI_COLORS;
-    if (defined $opts{colors} && ref $opts{colors} eq 'HASH')
-    {
-        while (my ($k, $v) = each %{ $opts{colors} })
-        {
-            $colors{$k} = $v;
-        }
-    }
+   my %colors = %ANSI_COLORS;
+   if (defined $opts{colors} && ref $opts{colors} eq 'HASH')
+   {
+      while (my ($k, $v) = each %{$opts{colors}})
+      {
+         $colors{$k} = $v;
+      }
+   }
 
-    my $self = {
-        colors => \%colors,
-    };
+   my $self = {colors => \%colors,};
 
-    bless $self, $class;
-    return $self;
+   bless $self, $class;
+   return $self;
 }
 
 #===========================================================================
@@ -78,46 +78,44 @@ sub new
 
 sub convert
 {
-    my ($self, $parse_result) = @_;
+   my ($self, $parse_result) = @_;
 
-    my $colors = $self->{colors};
-    my @lines;
+   my $colors = $self->{colors};
+   my @lines;
 
-    for my $line_tokens (@$parse_result)
-    {
-        my $line_str = '';
-        for my $token (@$line_tokens)
-        {
-            if ($token->{class} eq 'whitespace' || $token->{class} eq 'text')
+   for my $line_tokens (@$parse_result)
+   {
+      my $line_str = '';
+      for my $token (@$line_tokens)
+      {
+         if ($token->{class} eq 'whitespace' || $token->{class} eq 'text')
+         {
+            $line_str .= $token->{text};
+         }
+         else
+         {
+            my $entry = _resolve_ansi_color($token->{class}, $token->{sub_group}, $colors);
+            if ($entry)
             {
-                $line_str .= $token->{text};
+               if ($entry->{bold})
+               {
+                  $line_str .= "\e[1;38;5;" . $entry->{color} . "m" . $token->{text} . "\e[0m";
+               }
+               else
+               {
+                  $line_str .= "\e[38;5;" . $entry->{color} . "m" . $token->{text} . "\e[0m";
+               }
             }
             else
             {
-                my $entry = _resolve_ansi_color($token->{class}, $token->{sub_group}, $colors);
-                if ($entry)
-                {
-                    if ($entry->{bold})
-                    {
-                        $line_str .= "\e[1;38;5;" . $entry->{color} . "m"
-                            . $token->{text} . "\e[0m";
-                    }
-                    else
-                    {
-                        $line_str .= "\e[38;5;" . $entry->{color} . "m"
-                            . $token->{text} . "\e[0m";
-                    }
-                }
-                else
-                {
-                    $line_str .= $token->{text};
-                }
+               $line_str .= $token->{text};
             }
-        }
-        push @lines, $line_str;
-    }
+         }
+      }
+      push @lines, $line_str;
+   }
 
-    return join("\n", @lines);
+   return join("\n", @lines);
 }
 
 #===========================================================================
@@ -126,21 +124,21 @@ sub convert
 
 sub _resolve_ansi_color
 {
-    my ($class, $sub_group, $colors) = @_;
+   my ($class, $sub_group, $colors) = @_;
 
-    # Sub-group takes priority
-    if (defined $sub_group && exists $colors->{$sub_group})
-    {
-        return $colors->{$sub_group};
-    }
+   # Sub-group takes priority
+   if (defined $sub_group && exists $colors->{$sub_group})
+   {
+      return $colors->{$sub_group};
+   }
 
-    # Fall back to parent group
-    if (exists $colors->{$class})
-    {
-        return $colors->{$class};
-    }
+   # Fall back to parent group
+   if (exists $colors->{$class})
+   {
+      return $colors->{$class};
+   }
 
-    return undef;
+   return undef;
 }
 
 1;

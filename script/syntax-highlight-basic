@@ -10,12 +10,12 @@ use warnings;
 
 use Syntax::Highlight::Basic;
 use Getopt::Long qw(GetOptions);
-use Pod::Usage qw(pod2usage);
+use Pod::Usage   qw(pod2usage);
 
 Main:
 {
-    my $cli = _parse_options(@ARGV);
-    exit _run($cli);
+   my $cli = _parse_options(@ARGV);
+   exit _run($cli);
 }
 
 #===========================================================================
@@ -24,73 +24,74 @@ Main:
 
 sub _parse_options
 {
-    my (@args) = @_;
+   my (@args) = @_;
 
-    my $cli = {
-        language    => undef,
-        format      => undef,
-        syntax_dirs => [],
-        wrap        => 0,
-        css_class   => undef,
-        colors_file => undef,
-        colors      => undef,
-        help        => 0,
-        man         => 0,
-        version     => 0,
-        input       => undef,
-    };
+   my $cli = {
+              language    => undef,
+              format      => undef,
+              syntax_dirs => [],
+              wrap        => 0,
+              css_class   => undef,
+              colors_file => undef,
+              colors      => undef,
+              help        => 0,
+              man         => 0,
+              version     => 0,
+              input       => undef,
+              };
 
-    GetOptions(
-        'language=s'    => \$cli->{language},
-        'format=s'      => \$cli->{format},
-        'syntax-dir=s'  => sub { push @{$cli->{syntax_dirs}}, $_[1] },
-        'css-class=s'   => \$cli->{css_class},
-        'colors-file=s' => \$cli->{colors_file},
-        'wrap'          => \$cli->{wrap},
-        'no-wrap'       => sub { $cli->{wrap} = 0 },
-        'man'           => \$cli->{man},
-        'h|help'        => \$cli->{help},
-        'v|version'     => \$cli->{version},
-    ) or _error("Invalid options.");
+   GetOptions(
+              'language=s'    => \$cli->{language},
+              'format=s'      => \$cli->{format},
+              'syntax-dir=s'  => sub { push @{$cli->{syntax_dirs}}, $_[1] },
+              'css-class=s'   => \$cli->{css_class},
+              'colors-file=s' => \$cli->{colors_file},
+              'wrap'          => \$cli->{wrap},
+              'no-wrap'       => sub { $cli->{wrap} = 0 },
+              'man'           => \$cli->{man},
+              'h|help'        => \$cli->{help},
+              'v|version'     => \$cli->{version},
+     ) or
+     _error("Invalid options.");
 
-    if ($cli->{help})
-    {
-        _print_help();
-        exit 0;
-    }
+   if ($cli->{help})
+   {
+      _print_help();
+      exit 0;
+   }
 
-    if ($cli->{man})
-    {
-        pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
-    }
+   if ($cli->{man})
+   {
+      pod2usage(-verbose => 2, -exitval => 0, -input => $0, -output => \*STDOUT);
+   }
 
-    if ($cli->{version})
-    {
-        _print_version();
-        exit 0;
-    }
+   if ($cli->{version})
+   {
+      _print_version();
+      exit 0;
+   }
 
-    # Determine default format based on TTY
-    if (!defined $cli->{format})
-    {
-        $cli->{format} = -t STDOUT ? 'ansi' : 'html';
-    }
+   # Determine default format based on TTY
+   if (!defined $cli->{format})
+   {
+      $cli->{format} = -t STDOUT ? 'ansi' : 'html';
+   }
 
-    # Validate format
-    my %valid_formats = map { $_ => 1 } qw(pygments html ansi);
-    if (!$valid_formats{$cli->{format}})
-    {
-        _error("Unknown format '$cli->{format}'.  Valid formats: pygments, html, ansi");
-    }
+   # Validate format
+   my %valid_formats = map { $_ => 1 } qw(pygments html ansi);
+   if (!$valid_formats{$cli->{format}})
+   {
+      _error("Unknown format '$cli->{format}'.  Valid formats: pygments, html, ansi");
+   }
 
-    # Remaining args: input file
-    my @remaining = @ARGV;
-    if (@remaining > 0)
-    {
-        $cli->{input} = $remaining[0];
-    }
+   # Remaining args: input file
+   my @remaining = @ARGV;
+   if (@remaining > 0)
+   {
+      $cli->{input} = $remaining[0];
+   }
 
-    return $cli;
+   return $cli;
 }
 
 #===========================================================================
@@ -99,62 +100,64 @@ sub _parse_options
 
 sub _run
 {
-    my ($cli) = @_;
+   my ($cli) = @_;
 
-    my $input_file  = $cli->{input};
-    my $language    = $cli->{language};
-    my $format      = $cli->{format};
-    my $wrap        = $cli->{wrap};
-    my $css_class   = $cli->{css_class};
-    my $colors_file = $cli->{colors_file};
+   my $input_file  = $cli->{input};
+   my $language    = $cli->{language};
+   my $format      = $cli->{format};
+   my $wrap        = $cli->{wrap};
+   my $css_class   = $cli->{css_class};
+   my $colors_file = $cli->{colors_file};
 
-    # Load colors file if specified
-    my $colors;
-    if (defined $colors_file)
-    {
-        $colors = _load_colors_file($colors_file, $format);
-    }
+   # Load colors file if specified
+   my $colors;
+   if (defined $colors_file)
+   {
+      $colors = _load_colors_file($colors_file, $format);
+   }
 
-    # Read input
-    my $code;
-    if (defined $input_file && $input_file ne '-')
-    {
-        if (!-f $input_file)
-        {
-            _error("Input file '$input_file' does not exist or is not a regular file.");
-        }
-        open(my $fh, '<', $input_file) or
-            _error("Cannot open '$input_file': $!");
-        local $/;
-        $code = <$fh>;
-        close($fh);
+   # Read input
+   my $code;
+   if (defined $input_file && $input_file ne '-')
+   {
+      if (!-f $input_file)
+      {
+         _error("Input file '$input_file' does not exist or is not a regular file.");
+      }
+      open(my $fh, '<', $input_file) or
+        _error("Cannot open '$input_file': $!");
+      local $/;
+      $code = <$fh>;
+      close($fh);
 
-        # Auto-detect language from extension if not specified
-        if (!defined $language)
-        {
-            $language = _detect_language($input_file);
-        }
-    }
-    else
-    {
-        local $/;
-        $code = <STDIN>;
-    }
+      # Auto-detect language from extension if not specified
+      if (!defined $language)
+      {
+         $language = _detect_language($input_file);
+      }
+   }
+   else
+   {
+      local $/;
+      $code = <STDIN>;
+   }
 
-    # Create facade and highlight
-    my $shb = Syntax::Highlight::Basic->new(
-        syntax_dirs => $cli->{syntax_dirs},
-    );
+   # Create facade and highlight
+   my $shb = Syntax::Highlight::Basic->new(syntax_dirs => $cli->{syntax_dirs},);
 
-    my $result = $shb->highlight($code, $language, {
-        format    => $format,
-        wrap      => $wrap,
-        css_class => $css_class,
-        colors    => $colors,
-    });
+   my $result = $shb->highlight(
+                                $code,
+                                $language,
+                                {
+                                 format    => $format,
+                                 wrap      => $wrap,
+                                 css_class => $css_class,
+                                 colors    => $colors,
+                                }
+                                );
 
-    print $result;
-    return 0;
+   print $result;
+   return 0;
 }
 
 #===========================================================================
@@ -163,64 +166,64 @@ sub _run
 
 sub _detect_language
 {
-    my ($filename) = @_;
+   my ($filename) = @_;
 
-    my %ext_map = (
-        pl    => 'perl',
-        pm    => 'perl',
-        t     => 'perl',
-        py    => 'python',
-        pyw   => 'python',
-        pyi   => 'python',
-        js    => 'javascript',
-        c     => 'c',
-        h     => 'c',
-        cpp   => 'cpp',
-        cc    => 'cpp',
-        cxx   => 'cpp',
-        hpp   => 'cpp',
-        rb    => 'ruby',
-        sh    => 'sh',
-        bash  => 'sh',
-        go    => 'go',
-        java  => 'java',
-        sql    => 'sql',
-        yaml  => 'yaml',
-        yml   => 'yaml',
-        html  => 'html',
-        htm   => 'html',
-        css   => 'css',
-        php   => 'php',
-        rs    => 'rust',
-        json  => 'json',
-        xml   => 'xml',
-        swift => 'swift',
-        kt    => 'kotlin',
-        scala => 'scala',
-        lua   => 'lua',
-        r     => 'r',
-        cs    => 'cs',
-        dart  => 'dart',
-        hs    => 'haskell',
-        elm   => 'elm',
-        clj   => 'clojure',
-        ex    => 'elixir',
-        exs   => 'elixir',
-        zsh   => 'zsh',
-        fish  => 'fish',
-        vim   => 'vim',
-        make  => 'make',
-        mk    => 'make',
-        dockerfile => 'dockerfile',
-    );
+   my %ext_map = (
+                  pl         => 'perl',
+                  pm         => 'perl',
+                  t          => 'perl',
+                  py         => 'python',
+                  pyw        => 'python',
+                  pyi        => 'python',
+                  js         => 'javascript',
+                  c          => 'c',
+                  h          => 'c',
+                  cpp        => 'cpp',
+                  cc         => 'cpp',
+                  cxx        => 'cpp',
+                  hpp        => 'cpp',
+                  rb         => 'ruby',
+                  sh         => 'sh',
+                  bash       => 'sh',
+                  go         => 'go',
+                  java       => 'java',
+                  sql        => 'sql',
+                  yaml       => 'yaml',
+                  yml        => 'yaml',
+                  html       => 'html',
+                  htm        => 'html',
+                  css        => 'css',
+                  php        => 'php',
+                  rs         => 'rust',
+                  json       => 'json',
+                  xml        => 'xml',
+                  swift      => 'swift',
+                  kt         => 'kotlin',
+                  scala      => 'scala',
+                  lua        => 'lua',
+                  r          => 'r',
+                  cs         => 'cs',
+                  dart       => 'dart',
+                  hs         => 'haskell',
+                  elm        => 'elm',
+                  clj        => 'clojure',
+                  ex         => 'elixir',
+                  exs        => 'elixir',
+                  zsh        => 'zsh',
+                  fish       => 'fish',
+                  vim        => 'vim',
+                  make       => 'make',
+                  mk         => 'make',
+                  dockerfile => 'dockerfile',
+                  );
 
-    if ($filename =~ /\.([^.]+)$/)
-    {
-        my $ext = lc($1);
-        return $ext_map{$ext} if exists $ext_map{$ext};
-    }
+   if ($filename =~ /\.([^.]+)$/)
+   {
+      my $ext = lc($1);
+      return $ext_map{$ext} if exists $ext_map{$ext};
+   }
 
-    return undef;
+   return undef;
 }
 
 #===========================================================================
@@ -229,52 +232,52 @@ sub _detect_language
 
 sub _load_colors_file
 {
-    my ($path, $format) = @_;
+   my ($path, $format) = @_;
 
-    if (!-f $path)
-    {
-        _error("Colors file '$path' does not exist or is not a regular file.");
-    }
+   if (!-f $path)
+   {
+      _error("Colors file '$path' does not exist or is not a regular file.");
+   }
 
-    open(my $fh, '<', $path) or
-        _error("Cannot open colors file '$path': $!");
+   open(my $fh, '<', $path) or
+     _error("Cannot open colors file '$path': $!");
 
-    my %colors;
-    while (my $line = <$fh>)
-    {
-        chomp $line;
-        $line =~ s/^\s+//;
-        $line =~ s/\s+$//;
-        next if $line =~ /^#/;
-        next if $line =~ /^\s*$/;
+   my %colors;
+   while (my $line = <$fh>)
+   {
+      chomp $line;
+      $line =~ s/^\s+//;
+      $line =~ s/\s+$//;
+      next if $line =~ /^#/;
+      next if $line =~ /^\s*$/;
 
-        if ($line =~ /^(.+?)\s*=\s*(.+)$/)
-        {
-            my $key   = $1;
-            my $value = $2;
+      if ($line =~ /^(.+?)\s*=\s*(.+)$/)
+      {
+         my $key   = $1;
+         my $value = $2;
 
-            if (defined $format && $format eq 'ansi')
+         if (defined $format && $format eq 'ansi')
+         {
+            # ANSI format: color_index,bold_flag
+            if ($value =~ /^(\d+)\s*,\s*([01])$/)
             {
-                # ANSI format: color_index,bold_flag
-                if ($value =~ /^(\d+)\s*,\s*([01])$/)
-                {
-                    $colors{$key} = { color => int($1), bold => int($2) };
-                }
-                else
-                {
-                    _error("Invalid ANSI color value '$value' for key '$key'.  Expected: N,0 or N,1");
-                }
+               $colors{$key} = {color => int($1), bold => int($2)};
             }
             else
             {
-                # HTML/Pygments format: CSS color string
-                $colors{$key} = $value;
+               _error("Invalid ANSI color value '$value' for key '$key'.  Expected: N,0 or N,1");
             }
-        }
-    }
-    close($fh);
+         }
+         else
+         {
+            # HTML/Pygments format: CSS color string
+            $colors{$key} = $value;
+         }
+      }
+   }
+   close($fh);
 
-    return \%colors;
+   return \%colors;
 }
 
 #===========================================================================
@@ -283,7 +286,7 @@ sub _load_colors_file
 
 sub _print_help
 {
-    print <<'HELP';
+   print <<'HELP';
 Usage: syntax-highlight-basic [OPTIONS] [FILE]
 
 Apply syntax highlighting to source code.
@@ -312,16 +315,16 @@ HELP
 
 sub _print_version
 {
-    my $version = $Syntax::Highlight::Basic::VERSION // '0.1.0';
-    print "syntax-highlight-basic version $version\n";
+   my $version = $Syntax::Highlight::Basic::VERSION // '0.1.0';
+   print "syntax-highlight-basic version $version\n";
 }
 
 sub _error
 {
-    my ($msg) = @_;
+   my ($msg) = @_;
 
-    print STDERR "syntax-highlight-basic: $msg\n";
-    exit 1;
+   print STDERR "syntax-highlight-basic: $msg\n";
+   exit 1;
 }
 
 __END__

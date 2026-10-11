@@ -14,18 +14,22 @@ use Syntax::Highlight::Basic::Parser;
 #===========================================================================
 
 # Helper: find a token in parse result
-sub find_token {
-    my ($result, %criteria) = @_;
-    for my $line (@$result) {
-        for my $token (@$line) {
-            my $match = 1;
-            for my $key (keys %criteria) {
-                $match = 0 unless defined $token->{$key} && $token->{$key} eq $criteria{$key};
-            }
-            return $token if $match;
-        }
-    }
-    return undef;
+sub find_token
+{
+   my ($result, %criteria) = @_;
+   for my $line (@$result)
+   {
+      for my $token (@$line)
+      {
+         my $match = 1;
+         for my $key (keys %criteria)
+         {
+            $match = 0 unless defined $token->{$key} && $token->{$key} eq $criteria{$key};
+         }
+         return $token if $match;
+      }
+   }
+   return undef;
 }
 
 #===========================================================================
@@ -33,8 +37,8 @@ sub find_token {
 #===========================================================================
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_language_xyz');
-    isa_ok($p, 'Syntax::Highlight::Basic::Parser', 'constructor with unknown language succeeds');
+   my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_language_xyz');
+   isa_ok($p, 'Syntax::Highlight::Basic::Parser', 'constructor with unknown language succeeds');
 }
 
 #===========================================================================
@@ -42,10 +46,10 @@ sub find_token {
 #===========================================================================
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse('"hello world"');
-    my $token = find_token($result, sub_group => 'String');
-    ok(defined $token, 'fallback: double-quoted string detected');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse('"hello world"');
+   my $token  = find_token($result, sub_group => 'String');
+   ok(defined $token, 'fallback: double-quoted string detected');
 }
 
 #===========================================================================
@@ -53,10 +57,10 @@ sub find_token {
 #===========================================================================
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse("'single quoted'");
-    my $token = find_token($result, sub_group => 'String');
-    ok(defined $token, 'fallback: single-quoted string detected');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse("'single quoted'");
+   my $token  = find_token($result, sub_group => 'String');
+   ok(defined $token, 'fallback: single-quoted string detected');
 }
 
 #===========================================================================
@@ -64,17 +68,17 @@ sub find_token {
 #===========================================================================
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse('42');
-    my $token = find_token($result, sub_group => 'Number');
-    ok(defined $token, 'fallback: integer 42 detected as Number');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse('42');
+   my $token  = find_token($result, sub_group => 'Number');
+   ok(defined $token, 'fallback: integer 42 detected as Number');
 }
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse('3.14');
-    my $token = find_token($result, sub_group => 'Number');
-    ok(defined $token, 'fallback: float 3.14 detected as Number');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse('3.14');
+   my $token  = find_token($result, sub_group => 'Number');
+   ok(defined $token, 'fallback: float 3.14 detected as Number');
 }
 
 #===========================================================================
@@ -82,17 +86,17 @@ sub find_token {
 #===========================================================================
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse('{');
-    my $token = find_token($result, sub_group => 'Delimiter');
-    ok(defined $token, 'fallback: { detected as Delimiter');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse('{');
+   my $token  = find_token($result, sub_group => 'Delimiter');
+   ok(defined $token, 'fallback: { detected as Delimiter');
 }
 
 {
-    my $p = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
-    my $result = $p->parse('(');
-    my $token = find_token($result, sub_group => 'Delimiter');
-    ok(defined $token, 'fallback: ( detected as Delimiter');
+   my $p      = Syntax::Highlight::Basic::Parser->new(language => 'nonexistent_xyz');
+   my $result = $p->parse('(');
+   my $token  = find_token($result, sub_group => 'Delimiter');
+   ok(defined $token, 'fallback: ( detected as Delimiter');
 }
 
 #===========================================================================
@@ -100,28 +104,26 @@ sub find_token {
 #===========================================================================
 
 {
-    my $tmpdir = tempdir(CLEANUP => 1);
-    my $shb_path = "$tmpdir/fakelang.shb";
-    open(my $fh, '>', $shb_path) or die "Cannot create $shb_path: $!";
-    print $fh <<'SHB';
+   my $tmpdir   = tempdir(CLEANUP => 1);
+   my $shb_path = "$tmpdir/fakelang.shb";
+   open(my $fh, '>', $shb_path) or die "Cannot create $shb_path: $!";
+   print $fh <<'SHB';
 language: fakelang
 extensions: fk
 
 [keyword:Statement]
 fookeyword
 SHB
-    close($fh);
+   close($fh);
 
-    my $p = Syntax::Highlight::Basic::Parser->new(
-        language    => 'fakelang',
-        syntax_dirs => [$tmpdir],
-    );
-    isa_ok($p, 'Syntax::Highlight::Basic::Parser', 'constructor with custom syntax_dirs');
+   my $p = Syntax::Highlight::Basic::Parser->new(language    => 'fakelang',
+                                                 syntax_dirs => [$tmpdir],);
+   isa_ok($p, 'Syntax::Highlight::Basic::Parser', 'constructor with custom syntax_dirs');
 
-    my $result = $p->parse('fookeyword');
-    my $token = find_token($result, text => 'fookeyword');
-    ok(defined $token, 'found fookeyword token');
-    ok($token->{class} ne 'text', 'fookeyword is not text (recognized as keyword)');
+   my $result = $p->parse('fookeyword');
+   my $token  = find_token($result, text => 'fookeyword');
+   ok(defined $token,            'found fookeyword token');
+   ok($token->{class} ne 'text', 'fookeyword is not text (recognized as keyword)');
 }
 
 done_testing();

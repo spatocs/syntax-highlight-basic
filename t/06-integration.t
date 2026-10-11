@@ -17,9 +17,9 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('if ($x) {}', 'perl', { format => 'pygments' });
-    like($result, qr/<span class="k">if<\/span>/, 'pygments: if gets class="k"');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('if ($x) {}', 'perl', {format => 'pygments'});
+   like($result, qr/<span class="k">if<\/span>/, 'pygments: if gets class="k"');
 }
 
 #===========================================================================
@@ -27,9 +27,9 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('if ($x) {}', 'perl', { format => 'html' });
-    like($result, qr/<span style=/, 'html: output contains span with style');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('if ($x) {}', 'perl', {format => 'html'});
+   like($result, qr/<span style=/, 'html: output contains span with style');
 }
 
 #===========================================================================
@@ -37,10 +37,10 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('if ($x) {}', 'perl', { format => 'ansi' });
-    my $esc = chr(27);
-    like($result, qr/\Q${esc}[0m\E/, 'ansi: output contains ANSI reset code');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('if ($x) {}', 'perl', {format => 'ansi'});
+   my $esc    = chr(27);
+   like($result, qr/\Q${esc}[0m\E/, 'ansi: output contains ANSI reset code');
 }
 
 #===========================================================================
@@ -48,9 +48,9 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('"hello"', undef, { format => 'pygments' });
-    like($result, qr/<span class="s">/, 'fallback: string gets class="s"');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('"hello"', undef, {format => 'pygments'});
+   like($result, qr/<span class="s">/, 'fallback: string gets class="s"');
 }
 
 #===========================================================================
@@ -58,9 +58,9 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('code', 'perl', { format => 'pygments', wrap => 1 });
-    like($result, qr/^<div class="highlight">/, 'wrap: starts with div.highlight');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('code', 'perl', {format => 'pygments', wrap => 1});
+   like($result, qr/^<div class="highlight">/, 'wrap: starts with div.highlight');
 }
 
 #===========================================================================
@@ -68,9 +68,9 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('if', 'perl');
-    like($result, qr/<span style=/, 'default format produces HTML with style');
+   my $shb    = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight('if', 'perl');
+   like($result, qr/<span style=/, 'default format produces HTML with style');
 }
 
 #===========================================================================
@@ -78,13 +78,16 @@ use Syntax::Highlight::Basic;
 #===========================================================================
 
 {
-    my $shb = Syntax::Highlight::Basic->new();
-    my $result = $shb->highlight('code', 'perl', {
-        format    => 'pygments',
-        wrap      => 1,
-        css_class => 'custom-hl',
-    });
-    like($result, qr/class="custom-hl"/, 'css_class is passed through');
+   my $shb = Syntax::Highlight::Basic->new();
+   my $result = $shb->highlight(
+                                'code', 'perl',
+                                {
+                                 format    => 'pygments',
+                                 wrap      => 1,
+                                 css_class => 'custom-hl',
+                                }
+                                );
+   like($result, qr/class="custom-hl"/, 'css_class is passed through');
 }
 
 done_testing();

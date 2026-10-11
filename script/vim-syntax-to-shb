@@ -4,8 +4,8 @@ use 5.016;
 use strict;
 use warnings;
 
-use Getopt::Long qw(GetOptions);
-use Pod::Usage qw(pod2usage);
+use Getopt::Long   qw(GetOptions);
+use Pod::Usage     qw(pod2usage);
 use File::Basename qw(basename dirname);
 use File::Spec;
 use POSIX qw(strftime);
@@ -19,45 +19,45 @@ use constant MAX_INCLUDE_DEPTH => 5;
 
 # Default Vim sub-group to parent group mapping
 my %VIM_GROUP_PARENT = (
-    String         => 'Constant',
-    Character      => 'Constant',
-    Number         => 'Constant',
-    Boolean        => 'Constant',
-    Float          => 'Constant',
-    Function       => 'Identifier',
-    Conditional    => 'Statement',
-    Repeat         => 'Statement',
-    Label          => 'Statement',
-    Operator       => 'Statement',
-    Keyword        => 'Statement',
-    Exception      => 'Statement',
-    Include        => 'PreProc',
-    Define         => 'PreProc',
-    Macro          => 'PreProc',
-    PreCondit      => 'PreProc',
-    StorageClass   => 'Type',
-    Structure      => 'Type',
-    Typedef        => 'Type',
-    Tag            => 'Special',
-    SpecialChar    => 'Special',
-    Delimiter      => 'Special',
-    SpecialComment => 'Special',
-    Debug          => 'Special',
-);
+                        String         => 'Constant',
+                        Character      => 'Constant',
+                        Number         => 'Constant',
+                        Boolean        => 'Constant',
+                        Float          => 'Constant',
+                        Function       => 'Identifier',
+                        Conditional    => 'Statement',
+                        Repeat         => 'Statement',
+                        Label          => 'Statement',
+                        Operator       => 'Statement',
+                        Keyword        => 'Statement',
+                        Exception      => 'Statement',
+                        Include        => 'PreProc',
+                        Define         => 'PreProc',
+                        Macro          => 'PreProc',
+                        PreCondit      => 'PreProc',
+                        StorageClass   => 'Type',
+                        Structure      => 'Type',
+                        Typedef        => 'Type',
+                        Tag            => 'Special',
+                        SpecialChar    => 'Special',
+                        Delimiter      => 'Special',
+                        SpecialComment => 'Special',
+                        Debug          => 'Special',
+                        );
 
 # Valid Vim parent groups
 my %VIM_PARENT_GROUPS = map { $_ => 1 } qw(
-    Comment Constant Identifier Statement PreProc Type Special
-    Underlined Ignore Error Todo
-);
+  Comment Constant Identifier Statement PreProc Type Special
+  Underlined Ignore Error Todo
+  );
 
 # All valid groups (parent + sub-groups)
 my %VIM_ALL_GROUPS = (%VIM_PARENT_GROUPS, map { $_ => 1 } keys %VIM_GROUP_PARENT);
 
 Main:
 {
-    my $cli = _parse_options();
-    exit _run($cli);
+   my $cli = _parse_options();
+   exit _run($cli);
 }
 
 #===========================================================================
@@ -66,49 +66,50 @@ Main:
 
 sub _parse_options
 {
-    my %cli = (
-        output_dir      => '.',
-        language        => undef,
-        verbose         => 0,
-        help            => 0,
-        force           => 0,
-        min_sections    => 3,
-        warn_thin       => 1,
-        fail_on_thin    => 1,
-        follow_includes => 1,
-    );
+   my %cli = (
+              output_dir      => '.',
+              language        => undef,
+              verbose         => 0,
+              help            => 0,
+              force           => 0,
+              min_sections    => 3,
+              warn_thin       => 1,
+              fail_on_thin    => 1,
+              follow_includes => 1,
+              );
 
-    GetOptions(
-        'output-dir=s'     => \$cli{output_dir},
-        'language=s'       => \$cli{language},
-        'verbose'          => \$cli{verbose},
-        'force'            => \$cli{force},
-        'min-sections=i'   => \$cli{min_sections},
-        'warn-thin!'       => \$cli{warn_thin},
-        'fail-on-thin!'    => \$cli{fail_on_thin},
-        'follow-includes!' => \$cli{follow_includes},
-        'h|help'           => \$cli{help},
-    ) or pod2usage(2);
+   GetOptions(
+              'output-dir=s'     => \$cli{output_dir},
+              'language=s'       => \$cli{language},
+              'verbose'          => \$cli{verbose},
+              'force'            => \$cli{force},
+              'min-sections=i'   => \$cli{min_sections},
+              'warn-thin!'       => \$cli{warn_thin},
+              'fail-on-thin!'    => \$cli{fail_on_thin},
+              'follow-includes!' => \$cli{follow_includes},
+              'h|help'           => \$cli{help},
+     ) or
+     pod2usage(2);
 
-    if ($cli{help})
-    {
-        pod2usage(-verbose => 1, -exitval => 0);
-    }
+   if ($cli{help})
+   {
+      pod2usage(-verbose => 1, -exitval => 0);
+   }
 
-    if (!@ARGV)
-    {
-        pod2usage(-message => "Error: No input files or directories specified.", -exitval => 2);
-    }
+   if (!@ARGV)
+   {
+      pod2usage(-message => "Error: No input files or directories specified.", -exitval => 2);
+   }
 
-    $cli{inputs} = [@ARGV];
+   $cli{inputs} = [@ARGV];
 
-    if ($cli{language} && @{$cli{inputs}} > 1)
-    {
-        warn "Warning: --language is only valid with a single input file; ignoring.\n";
-        $cli{language} = undef;
-    }
+   if ($cli{language} && @{$cli{inputs}} > 1)
+   {
+      warn "Warning: --language is only valid with a single input file; ignoring.\n";
+      $cli{language} = undef;
+   }
 
-    return \%cli;
+   return \%cli;
 }
 
 #===========================================================================
@@ -117,108 +118,105 @@ sub _parse_options
 
 sub _run
 {
-    my ($cli) = @_;
+   my ($cli) = @_;
 
-    my @files;
-    for my $input (@{$cli->{inputs}})
-    {
-        if (-d $input)
-        {
-            my @vim_files = glob("$input/*.vim");
-            push @files, @vim_files;
-        }
-        elsif (-f $input)
-        {
-            push @files, $input;
-        }
-        else
-        {
-            warn "Error: '$input' is not a file or directory; skipping.\n";
-        }
-    }
+   my @files;
+   for my $input (@{$cli->{inputs}})
+   {
+      if (-d $input)
+      {
+         my @vim_files = glob("$input/*.vim");
+         push @files, @vim_files;
+      }
+      elsif (-f $input)
+      {
+         push @files, $input;
+      }
+      else
+      {
+         warn "Error: '$input' is not a file or directory; skipping.\n";
+      }
+   }
 
-    if (!@files)
-    {
-        warn "Error: No .vim files found.\n";
-        return 1;
-    }
+   if (!@files)
+   {
+      warn "Error: No .vim files found.\n";
+      return 1;
+   }
 
-    my $errors      = 0;
-    my $converted   = 0;
-    my $thin_count  = 0;
-    my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
+   my $errors       = 0;
+   my $converted    = 0;
+   my $thin_count   = 0;
+   my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
 
-    for my $file (@files)
-    {
-        my $lang = $cli->{language};
-        if (!$lang)
-        {
-            my $base = basename($file);
-            $base =~ s/\.vim$//i;
-            $lang = lc($base);
-        }
+   for my $file (@files)
+   {
+      my $lang = $cli->{language};
+      if (!$lang)
+      {
+         my $base = basename($file);
+         $base =~ s/\.vim$//i;
+         $lang = lc($base);
+      }
 
-        my $outfile = "$cli->{output_dir}/$lang.shb";
+      my $outfile = "$cli->{output_dir}/$lang.shb";
 
-        # Check if output file is curated -- skip unless --force
-        if (!$cli->{force} && -f $outfile && _is_curated($outfile))
-        {
-            warn "Skipping curated file: $outfile (use --force to override)\n";
-            next;
-        }
+      # Check if output file is curated -- skip unless --force
+      if (!$cli->{force} && -f $outfile && _is_curated($outfile))
+      {
+         warn "Skipping curated file: $outfile (use --force to override)\n";
+         next;
+      }
 
-        warn "Processing: $file -> $lang.shb\n" if $cli->{verbose};
+      warn "Processing: $file -> $lang.shb\n" if $cli->{verbose};
 
-        my $conv = _convert_file($file, $lang, $cli);
-        if (!$conv)
-        {
-            $errors++;
-            next;
-        }
+      my $conv = _convert_file($file, $lang, $cli);
+      if (!$conv)
+      {
+         $errors++;
+         next;
+      }
 
-        $converted++;
+      $converted++;
 
-        if ($conv->{thin})
-        {
-            $thin_count++;
+      if ($conv->{thin})
+      {
+         $thin_count++;
 
-            if ($cli->{warn_thin})
+         if ($cli->{warn_thin})
+         {
+            my $reason;
+            if ($conv->{delegated_only} && defined $conv->{directive_text})
             {
-                my $reason;
-                if ($conv->{delegated_only} && defined $conv->{directive_text})
-                {
-                    $reason = "(source delegates via: $conv->{directive_text})";
-                }
-                else
-                {
-                    $reason = "(below threshold $min_sections)";
-                }
-                warn sprintf(
-                    "THIN  %-20s sections=%d  %s\n",
-                    "$lang.shb", $conv->{section_count}, $reason
-                );
+               $reason = "(source delegates via: $conv->{directive_text})";
             }
-        }
+            else
+            {
+               $reason = "(below threshold $min_sections)";
+            }
+            warn sprintf("THIN  %-20s sections=%d  %s\n", "$lang.shb", $conv->{section_count}, $reason);
+         }
+      }
 
-        if (!open(my $fh, '>', $outfile))
-        {
-            warn "Error: Cannot write '$outfile': $!\n";
-            $errors++;
-            next;
-        }
-        else
-        {
-            print $fh $conv->{text};
-            close $fh;
-            warn "Wrote: $outfile\n" if $cli->{verbose};
-        }
-    }
+      if (!open(my $fh, '>', $outfile))
+      {
+         warn "Error: Cannot write '$outfile': $!\n";
+         $errors++;
+         next;
+      }
+      else
+      {
+         print $fh $conv->{text};
+         close $fh;
+         warn "Wrote: $outfile\n" if $cli->{verbose};
+      }
+   }
 
-    warn "Converted $converted file(s); $thin_count thin.\n";
+   warn "Converted $converted file(s); $thin_count thin.\n";
 
-    return 1 if $errors;
-    return 1 if $cli->{fail_on_thin} && $thin_count > 0;
-    return 0;
+   return 1 if $errors;
+   return 1 if $cli->{fail_on_thin} && $thin_count > 0;
+   return 0;
 }
 
 #===========================================================================
@@ -227,21 +225,21 @@ sub _run
 
 sub _is_curated
 {
-    my ($file) = @_;
+   my ($file) = @_;
 
-    return 0 unless -f $file;
+   return 0 unless -f $file;
 
-    open(my $fh, '<', $file) or return 0;
-    while (my $line = <$fh>)
-    {
-        if ($line =~ /^#\s*\@curated/)
-        {
-            close $fh;
-            return 1;
-        }
-    }
-    close $fh;
-    return 0;
+   open(my $fh, '<', $file) or return 0;
+   while (my $line = <$fh>)
+   {
+      if ($line =~ /^#\s*\@curated/)
+      {
+         close $fh;
+         return 1;
+      }
+   }
+   close $fh;
+   return 0;
 }
 
 #===========================================================================
@@ -251,72 +249,72 @@ sub _is_curated
 
 sub _read_vim_lines
 {
-    my ($path, $visited, $depth, $cli, $info) = @_;
+   my ($path, $visited, $depth, $cli, $info) = @_;
 
-    my @lines;
-    my $abs;
-    my $dir;
-    my $own_rule;
-    my @out;
-    my $line;
-    my $target;
-    my $dirtext;
-    my $resolved;
+   my @lines;
+   my $abs;
+   my $dir;
+   my $own_rule;
+   my @out;
+   my $line;
+   my $target;
+   my $dirtext;
+   my $resolved;
 
-    $abs = File::Spec->rel2abs($path);
-    return () if $visited->{$abs};
-    $visited->{$abs} = 1;
+   $abs = File::Spec->rel2abs($path);
+   return () if $visited->{$abs};
+   $visited->{$abs} = 1;
 
-    if (!open(my $fh, '<', $path))
-    {
-        warn "Error: Cannot open '$path': $!\n";
-        return ();
-    }
-    else
-    {
-        local $/;
-        my $content = <$fh>;
-        close $fh;
-        @lines = split /\n/, (defined $content ? $content : '');
-    }
+   if (!open(my $fh, '<', $path))
+   {
+      warn "Error: Cannot open '$path': $!\n";
+      return ();
+   }
+   else
+   {
+      local $/;
+      my $content = <$fh>;
+      close $fh;
+      @lines = split /\n/, (defined $content ? $content : '');
+   }
 
-    return @lines unless $cli->{follow_includes};
-    return @lines if $depth >= MAX_INCLUDE_DEPTH;
+   return @lines unless $cli->{follow_includes};
+   return @lines if $depth >= MAX_INCLUDE_DEPTH;
 
-    $dir       = dirname($abs);
-    $own_rule  = 0;
-    @out       = ();
+   $dir      = dirname($abs);
+   $own_rule = 0;
+   @out      = ();
 
-    for $line (@lines)
-    {
-        if ($line =~ /^\s*syn(?:tax)?\s+(?:keyword|match|region)\b/i)
-        {
-            $own_rule = 1;
-        }
+   for $line (@lines)
+   {
+      if ($line =~ /^\s*syn(?:tax)?\s+(?:keyword|match|region)\b/i)
+      {
+         $own_rule = 1;
+      }
 
-        ($target, $dirtext) = _detect_include_directive($line, $dir);
-        if (defined $target)
-        {
-            push @{$info->{directive_texts}}, $dirtext if $depth == 0;
+      ($target, $dirtext) = _detect_include_directive($line, $dir);
+      if (defined $target)
+      {
+         push @{$info->{directive_texts}}, $dirtext if $depth == 0;
 
-            $resolved = _resolve_include_target($target, $dir, $info->{synroot});
-            if ($resolved)
-            {
-                push @out, _read_vim_lines($resolved, $visited, $depth + 1, $cli, $info);
-            }
-            else
-            {
-                warn "Warning: cannot locate included file for '$dirtext' (referenced from '$path')\n";
-            }
-            next;
-        }
+         $resolved = _resolve_include_target($target, $dir, $info->{synroot});
+         if ($resolved)
+         {
+            push @out, _read_vim_lines($resolved, $visited, $depth + 1, $cli, $info);
+         }
+         else
+         {
+            warn "Warning: cannot locate included file for '$dirtext' (referenced from '$path')\n";
+         }
+         next;
+      }
 
-        push @out, $line;
-    }
+      push @out, $line;
+   }
 
-    $info->{depth0_had_own_rule} = $own_rule if $depth == 0;
+   $info->{depth0_had_own_rule} = $own_rule if $depth == 0;
 
-    return @out;
+   return @out;
 }
 
 #===========================================================================
@@ -326,31 +324,31 @@ sub _read_vim_lines
 
 sub _detect_include_directive
 {
-    my ($line, $dir) = @_;
+   my ($line, $dir) = @_;
 
-    my $text = $line;
-    $text =~ s/^\s+//;
-    $text =~ s/\s+$//;
+   my $text = $line;
+   $text =~ s/^\s+//;
+   $text =~ s/\s+$//;
 
-    if ($line =~ /^\s*runtime!?\s+syntax\/(\S+?)\.vim\b/i)
-    {
-        return ("$1.vim", $text);
-    }
-    if ($line =~ /^\s*source\s+<sfile>:h\/(\S+)/i)
-    {
-        my $rel = $1;
-        return ("$dir/$rel", $text);
-    }
-    if ($line =~ /^\s*(?:source|so)\s+(\S+)/i)
-    {
-        return ($1, $text);
-    }
-    if ($line =~ /^\s*syn(?:tax)?\s+include\s+\@?\S+\s+syntax\/(\S+?)\.vim\b/i)
-    {
-        return ("$1.vim", $text);
-    }
+   if ($line =~ /^\s*runtime!?\s+syntax\/(\S+?)\.vim\b/i)
+   {
+      return ("$1.vim", $text);
+   }
+   if ($line =~ /^\s*source\s+<sfile>:h\/(\S+)/i)
+   {
+      my $rel = $1;
+      return ("$dir/$rel", $text);
+   }
+   if ($line =~ /^\s*(?:source|so)\s+(\S+)/i)
+   {
+      return ($1, $text);
+   }
+   if ($line =~ /^\s*syn(?:tax)?\s+include\s+\@?\S+\s+syntax\/(\S+?)\.vim\b/i)
+   {
+      return ("$1.vim", $text);
+   }
 
-    return (undef, undef);
+   return (undef, undef);
 }
 
 #===========================================================================
@@ -361,26 +359,26 @@ sub _detect_include_directive
 
 sub _resolve_include_target
 {
-    my ($target, $dir, $synroot) = @_;
+   my ($target, $dir, $synroot) = @_;
 
-    my @candidates;
+   my @candidates;
 
-    if (File::Spec->file_name_is_absolute($target))
-    {
-        push @candidates, $target;
-    }
-    else
-    {
-        push @candidates, File::Spec->catfile($dir, $target);
-        push @candidates, File::Spec->catfile($synroot, $target) if defined $synroot;
-    }
+   if (File::Spec->file_name_is_absolute($target))
+   {
+      push @candidates, $target;
+   }
+   else
+   {
+      push @candidates, File::Spec->catfile($dir,     $target);
+      push @candidates, File::Spec->catfile($synroot, $target) if defined $synroot;
+   }
 
-    for my $c (@candidates)
-    {
-        return $c if -f $c;
-    }
+   for my $c (@candidates)
+   {
+      return $c if -f $c;
+   }
 
-    return undef;
+   return undef;
 }
 
 #===========================================================================
@@ -389,353 +387,354 @@ sub _resolve_include_target
 
 sub _convert_file
 {
-    my ($file, $lang, $cli) = @_;
+   my ($file, $lang, $cli) = @_;
 
-    my $verbose = $cli->{verbose};
-    my %info    = (synroot => dirname(File::Spec->rel2abs($file)));
-    my $visited = {};
-    my @lines   = _read_vim_lines($file, $visited, 0, $cli, \%info);
+   my $verbose = $cli->{verbose};
+   my %info    = (synroot => dirname(File::Spec->rel2abs($file)));
+   my $visited = {};
+   my @lines   = _read_vim_lines($file, $visited, 0, $cli, \%info);
 
-    # Join continuation lines (lines ending with \ in Vim, next line starts with \)
-    my @joined;
-    my $current = '';
-    for my $line (@lines)
-    {
-        # Vim continuation: next line starts with a backslash
-        if ($line =~ /^\s*\\(.*)$/)
-        {
-            $current .= ' ' . $1;
-        }
-        else
-        {
-            push @joined, $current if $current ne '';
-            $current = $line;
-        }
-    }
-    push @joined, $current if $current ne '';
+   # Join continuation lines (lines ending with \ in Vim, next line starts with \)
+   my @joined;
+   my $current = '';
+   for my $line (@lines)
+   {
+      # Vim continuation: next line starts with a backslash
+      if ($line =~ /^\s*\\(.*)$/)
+      {
+         $current .= ' ' . $1;
+      }
+      else
+      {
+         push @joined, $current if $current ne '';
+         $current = $line;
+      }
+   }
+   push @joined, $current if $current ne '';
 
-    # Parse the joined lines
-    my %keywords;    # group => [ words ]
-    my @matches;     # [ { group, pattern } ]
-    my @regions;     # [ { group, start, end, escape } ]
-    my %hi_links;    # subgroup => parent
-    my $case_fold = 0;
-    my $extensions = '';
+   # Parse the joined lines
+   my %keywords;    # group => [ words ]
+   my @matches;     # [ { group, pattern } ]
+   my @regions;     # [ { group, start, end, escape } ]
+   my %hi_links;    # subgroup => parent
+   my $case_fold  = 0;
+   my $extensions = '';
 
-    # Try to detect language name and extensions from comments
-    my $max = @joined < 20 ? $#joined : 19;
-    for my $i (0 .. $max)
-    {
-        my $line = $joined[$i];
-        next unless defined $line;
-        if ($line =~ /^\s*"\s*Language\s*:\s*(.+)/i)
-        {
-            # e.g. " Language: Perl
-            my $lang_comment = $1;
-            $lang_comment =~ s/\s+$//;
-            # Don't override $lang from filename
-        }
-        if ($line =~ /^\s*"\s*(?:FileType|filetype)\s*:\s*(.+)/i)
-        {
-            $extensions = lc($1);
-            $extensions =~ s/\s+$//;
-        }
-    }
+   # Try to detect language name and extensions from comments
+   my $max = @joined < 20 ? $#joined : 19;
+   for my $i (0 .. $max)
+   {
+      my $line = $joined[$i];
+      next unless defined $line;
+      if ($line =~ /^\s*"\s*Language\s*:\s*(.+)/i)
+      {
+         # e.g. " Language: Perl
+         my $lang_comment = $1;
+         $lang_comment =~ s/\s+$//;
 
-    # Pass 1: collect all hi def link statements and case settings
-    for my $line (@joined)
-    {
-        next unless defined $line;
-        next if $line =~ /^\s*"/;
-        next if $line =~ /^\s*$/;
-        my $stmt = $line;
-        $stmt =~ s/\s+"[^"]*$//;
+         # Don't override $lang from filename
+      }
+      if ($line =~ /^\s*"\s*(?:FileType|filetype)\s*:\s*(.+)/i)
+      {
+         $extensions = lc($1);
+         $extensions =~ s/\s+$//;
+      }
+   }
 
-        if ($stmt =~ /^\s*syn\s+case\s+ignore\b/i)
-        {
-            $case_fold = 1;
-        }
-        elsif ($stmt =~ /^\s*syn\s+case\s+match\b/i)
-        {
-            $case_fold = 0;
-        }
-        elsif ($stmt =~ /^\s*hi(?:ghlight)?\s+(?:def\s+)?link\s+(\w+)\s+(\w+)/i)
-        {
-            my ($sub, $parent) = ($1, $2);
-            $hi_links{$sub} = $parent;
-        }
-    }
+   # Pass 1: collect all hi def link statements and case settings
+   for my $line (@joined)
+   {
+      next unless defined $line;
+      next if $line =~ /^\s*"/;
+      next if $line =~ /^\s*$/;
+      my $stmt = $line;
+      $stmt =~ s/\s+"[^"]*$//;
 
-    # Pass 2: process syn keyword, syn match, syn region
-    for my $line (@joined)
-    {
-        next unless defined $line;
-        # Skip pure comment lines (Vimscript comments start with ")
-        next if $line =~ /^\s*"/;
-        next if $line =~ /^\s*$/;
+      if ($stmt =~ /^\s*syn\s+case\s+ignore\b/i)
+      {
+         $case_fold = 1;
+      }
+      elsif ($stmt =~ /^\s*syn\s+case\s+match\b/i)
+      {
+         $case_fold = 0;
+      }
+      elsif ($stmt =~ /^\s*hi(?:ghlight)?\s+(?:def\s+)?link\s+(\w+)\s+(\w+)/i)
+      {
+         my ($sub, $parent) = ($1, $2);
+         $hi_links{$sub} = $parent;
+      }
+   }
 
-        # Strip inline comments
-        my $stmt = $line;
-        $stmt =~ s/\s+"[^"]*$//;    # strip trailing " comment
+   # Pass 2: process syn keyword, syn match, syn region
+   for my $line (@joined)
+   {
+      next unless defined $line;
 
-        # syn keyword GROUP words...
-        if ($stmt =~ /^\s*syn(?:tax)?\s+keyword\s+(\w+)\s+(.*)/i)
-        {
-            my ($group, $rest) = ($1, $2);
+      # Skip pure comment lines (Vimscript comments start with ")
+      next if $line =~ /^\s*"/;
+      next if $line =~ /^\s*$/;
 
-            # Strip options like contained, nextgroup=, skipwhite, etc.
-            $rest =~ s/\b(?:contained|transparent|skipwhite|skipnl|skipempty)\b//g;
-            $rest =~ s/\b(?:nextgroup|contains|containedin|conceal|concealends)=\S+//g;
+      # Strip inline comments
+      my $stmt = $line;
+      $stmt =~ s/\s+"[^"]*$//;    # strip trailing " comment
 
-            my @words = split /\s+/, $rest;
-            @words = grep { /^\w/ && !/=/ } @words;    # only plain words
+      # syn keyword GROUP words...
+      if ($stmt =~ /^\s*syn(?:tax)?\s+keyword\s+(\w+)\s+(.*)/i)
+      {
+         my ($group, $rest) = ($1, $2);
 
-            if (@words)
-            {
-                my $resolved = _resolve_group($group, \%hi_links, $lang);
-                if ($resolved)
-                {
-                    push @{$keywords{$resolved}}, @words;
-                }
-            }
-            next;
-        }
+         # Strip options like contained, nextgroup=, skipwhite, etc.
+         $rest =~ s/\b(?:contained|transparent|skipwhite|skipnl|skipempty)\b//g;
+         $rest =~ s/\b(?:nextgroup|contains|containedin|conceal|concealends)=\S+//g;
 
-        # syn match GROUP "pattern" or syn match GROUP /pattern/
-        if ($stmt =~ /^\s*syn(?:tax)?\s+match\s+(\w+)\s+(.*)/i)
-        {
-            my ($group, $rest) = ($1, $2);
+         my @words = split /\s+/, $rest;
+         @words = grep { /^\w/ && !/=/ } @words;    # only plain words
 
-            # Skip if it has complex options we can't handle
-            # Allow contains=@Spell but skip other contains= values
-            next if $rest =~ /\bcontains=/ && $rest !~ /\bcontains=\@Spell\b/;
-
-            # Extract the pattern -- try quoted forms
-            my $pattern = undef;
-            if ($rest =~ /^"((?:[^"\\]|\\.)*)"/s)
-            {
-                $pattern = $1;
-            }
-            elsif ($rest =~ m{^/((?:[^/\\]|\\.)*)/}s)
-            {
-                $pattern = $1;
-            }
-            elsif ($rest =~ /^\+((?:[^+\\]|\\.)*)\+/s)
-            {
-                $pattern = $1;
-            }
-
-            next unless defined $pattern && length $pattern;
-
-            # Check if this is a keyword alternation: \<\%(word1\|word2\|...\)\>
-            # Convert to keywords instead of a match pattern
-            my @extracted = _extract_keyword_alternation($pattern);
-            if (@extracted)
-            {
-                my $resolved = _resolve_group($group, \%hi_links, $lang);
-                if ($resolved)
-                {
-                    push @{$keywords{$resolved}}, @extracted;
-                }
-                next;
-            }
-
-            # Convert Vim regex to Perl regex
-            my $perl_pattern = _vim_to_perl_regex($pattern);
-            next unless defined $perl_pattern;
-
-            # Validate the pattern (suppress regex warnings -- eval catches errors)
-            my $valid;
-            {
-                no warnings 'regexp';
-                $valid = eval { qr/$perl_pattern/; 1 };
-            }
-            if (!$valid)
-            {
-                warn "Warning: Skipping invalid pattern from $file: /$perl_pattern/ ($@)\n"
-                    if $verbose;
-                next;
-            }
-
-            # Sanity check: reject overly broad patterns
-            if (_pattern_is_too_broad($perl_pattern))
-            {
-                warn "Warning: Skipping overly broad pattern from $file: $perl_pattern\n"
-                    if $verbose;
-                next;
-            }
-
+         if (@words)
+         {
             my $resolved = _resolve_group($group, \%hi_links, $lang);
             if ($resolved)
             {
-                push @matches, { group => $resolved, pattern => $perl_pattern };
+               push @{$keywords{$resolved}}, @words;
             }
-            next;
-        }
+         }
+         next;
+      }
 
-        # syn region GROUP start="pat" end="pat" [skip="pat"]
-        if ($stmt =~ /^\s*syn(?:tax)?\s+region\s+(\w+)\s+(.*)/i)
-        {
-            my ($group, $rest) = ($1, $2);
+      # syn match GROUP "pattern" or syn match GROUP /pattern/
+      if ($stmt =~ /^\s*syn(?:tax)?\s+match\s+(\w+)\s+(.*)/i)
+      {
+         my ($group, $rest) = ($1, $2);
 
-            # Extract regions even if they have contains=/matchgroup= -- start/end are still valid
+         # Skip if it has complex options we can't handle
+         # Allow contains=@Spell but skip other contains= values
+         next if $rest =~ /\bcontains=/ && $rest !~ /\bcontains=\@Spell\b/;
 
-            # Extract start=
-            my $start = undef;
-            if ($rest =~ /\bstart=["']((?:[^"'\\]|\\.)*)['"]/s)
-            {
-                $start = $1;
-            }
-            elsif ($rest =~ /\bstart=\+((?:[^+\\]|\\.)*)\+/s)
-            {
-                $start = $1;
-            }
+         # Extract the pattern -- try quoted forms
+         my $pattern = undef;
+         if ($rest =~ /^"((?:[^"\\]|\\.)*)"/s)
+         {
+            $pattern = $1;
+         }
+         elsif ($rest =~ m{^/((?:[^/\\]|\\.)*)/}s)
+         {
+            $pattern = $1;
+         }
+         elsif ($rest =~ /^\+((?:[^+\\]|\\.)*)\+/s)
+         {
+            $pattern = $1;
+         }
 
-            # Extract end=
-            my $end = undef;
-            if ($rest =~ /\bend=["']((?:[^"'\\]|\\.)*)['"]/s)
-            {
-                $end = $1;
-            }
-            elsif ($rest =~ /\bend=\+((?:[^+\\]|\\.)*)\+/s)
-            {
-                $end = $1;
-            }
+         next unless defined $pattern && length $pattern;
 
-            next unless defined $start && defined $end && length $start && length $end;
-
-            # Filter: for String/Character groups only keep " and ' delimiters
-            # (skip Perl q()/qq()/qw() constructs using ()[]{}<> delimiters)
+         # Check if this is a keyword alternation: \<\%(word1\|word2\|...\)\>
+         # Convert to keywords instead of a match pattern
+         my @extracted = _extract_keyword_alternation($pattern);
+         if (@extracted)
+         {
             my $resolved = _resolve_group($group, \%hi_links, $lang);
-            if ($resolved && ($resolved eq 'String' || $resolved eq 'Character'))
-            {
-                next unless $start eq '"' || $start eq "'";
-            }
-
-            # Extract skip= (escape pattern)
-            my $escape = undef;
-            if ($rest =~ /\bskip=["']((?:[^"'\\]|\\.)*)['"]/s)
-            {
-                my $skip = $1;
-                # If skip is like \\ or \\. or \\" etc., extract the escape char
-                if ($skip =~ /^\\\\/)
-                {
-                    $escape = '\\';
-                }
-            }
-
-            # Convert Vim regex start/end to literal strings where possible
-            # Simple patterns like " or ' or /* or */ are already literal
-            $start = _vim_region_delim_to_literal($start);
-            $end   = _vim_region_delim_to_literal($end);
-
-            next unless defined $start && defined $end;
-
-            $resolved = _resolve_group($group, \%hi_links, $lang);
             if ($resolved)
             {
-                my %region = (group => $resolved, start => $start, end => $end);
-                $region{escape} = $escape if defined $escape;
-                push @regions, \%region;
+               push @{$keywords{$resolved}}, @extracted;
             }
             next;
-        }
-    }
+         }
 
-    # Determine extensions
-    if (!$extensions)
-    {
-        $extensions = $lang;
-    }
+         # Convert Vim regex to Perl regex
+         my $perl_pattern = _vim_to_perl_regex($pattern);
+         next unless defined $perl_pattern;
 
-    # Build the .shb output
-    my $date    = strftime('%Y-%m-%d', localtime);
-    my $output  = '';
-    $output    .= "# Syntax file for $lang\n";
-    $output    .= "# Converted from: " . basename($file) . "\n";
-    $output    .= "# Conversion date: $date\n";
-    $output    .= "\n";
-    $output    .= "language: $lang\n";
-    $output    .= "extensions: $extensions\n";
-    if ($case_fold)
-    {
-        $output .= "case: ignore\n";
-    }
-    $output .= "\n";
+         # Validate the pattern (suppress regex warnings -- eval catches errors)
+         my $valid;
+         {
+            no warnings 'regexp';
+            $valid = eval { qr/$perl_pattern/; 1 };
+         }
+         if (!$valid)
+         {
+            warn "Warning: Skipping invalid pattern from $file: /$perl_pattern/ ($@)\n"
+              if $verbose;
+            next;
+         }
 
-    # Write keyword sections
-    for my $group (sort keys %keywords)
-    {
-        my @words = do {
-            my %seen;
-            grep { !$seen{$_}++ } sort @{$keywords{$group}};
-        };
-        next unless @words;
+         # Sanity check: reject overly broad patterns
+         if (_pattern_is_too_broad($perl_pattern))
+         {
+            warn "Warning: Skipping overly broad pattern from $file: $perl_pattern\n"
+              if $verbose;
+            next;
+         }
 
-        $output .= "[keyword:$group]\n";
+         my $resolved = _resolve_group($group, \%hi_links, $lang);
+         if ($resolved)
+         {
+            push @matches, {group => $resolved, pattern => $perl_pattern};
+         }
+         next;
+      }
 
-        # Write words in lines of ~80 chars
-        my $line_buf = '';
-        for my $word (@words)
-        {
-            if (length($line_buf) + length($word) + 1 > 78)
+      # syn region GROUP start="pat" end="pat" [skip="pat"]
+      if ($stmt =~ /^\s*syn(?:tax)?\s+region\s+(\w+)\s+(.*)/i)
+      {
+         my ($group, $rest) = ($1, $2);
+
+         # Extract regions even if they have contains=/matchgroup= -- start/end are still valid
+
+         # Extract start=
+         my $start = undef;
+         if ($rest =~ /\bstart=["']((?:[^"'\\]|\\.)*)['"]/s)
+         {
+            $start = $1;
+         }
+         elsif ($rest =~ /\bstart=\+((?:[^+\\]|\\.)*)\+/s)
+         {
+            $start = $1;
+         }
+
+         # Extract end=
+         my $end = undef;
+         if ($rest =~ /\bend=["']((?:[^"'\\]|\\.)*)['"]/s)
+         {
+            $end = $1;
+         }
+         elsif ($rest =~ /\bend=\+((?:[^+\\]|\\.)*)\+/s)
+         {
+            $end = $1;
+         }
+
+         next unless defined $start && defined $end && length $start && length $end;
+
+         # Filter: for String/Character groups only keep " and ' delimiters
+         # (skip Perl q()/qq()/qw() constructs using ()[]{}<> delimiters)
+         my $resolved = _resolve_group($group, \%hi_links, $lang);
+         if ($resolved && ($resolved eq 'String' || $resolved eq 'Character'))
+         {
+            next unless $start eq '"' || $start eq "'";
+         }
+
+         # Extract skip= (escape pattern)
+         my $escape = undef;
+         if ($rest =~ /\bskip=["']((?:[^"'\\]|\\.)*)['"]/s)
+         {
+            my $skip = $1;
+
+            # If skip is like \\ or \\. or \\" etc., extract the escape char
+            if ($skip =~ /^\\\\/)
             {
-                $output   .= $line_buf . "\n";
-                $line_buf  = $word;
+               $escape = '\\';
             }
-            elsif ($line_buf eq '')
-            {
-                $line_buf = $word;
-            }
-            else
-            {
-                $line_buf .= " $word";
-            }
-        }
-        $output .= $line_buf . "\n" if $line_buf ne '';
-        $output .= "\n";
-    }
+         }
 
-    # Write match sections
-    for my $match (@matches)
-    {
-        $output .= "[match:$match->{group}]\n";
-        $output .= "pattern: $match->{pattern}\n";
-        $output .= "\n";
-    }
+         # Convert Vim regex start/end to literal strings where possible
+         # Simple patterns like " or ' or /* or */ are already literal
+         $start = _vim_region_delim_to_literal($start);
+         $end   = _vim_region_delim_to_literal($end);
 
-    # Write region sections
-    for my $region (@regions)
-    {
-        $output .= "[region:$region->{group}]\n";
-        $output .= "start: $region->{start}\n";
-        $output .= "end: $region->{end}\n";
-        $output .= "escape: $region->{escape}\n" if defined $region->{escape};
-        $output .= "\n";
-    }
+         next unless defined $start && defined $end;
 
-    my $section_count =
-          (scalar grep { @{$keywords{$_}} } keys %keywords)
-        + scalar(@matches)
-        + scalar(@regions);
+         $resolved = _resolve_group($group, \%hi_links, $lang);
+         if ($resolved)
+         {
+            my %region = (group => $resolved, start => $start, end => $end);
+            $region{escape} = $escape if defined $escape;
+            push @regions, \%region;
+         }
+         next;
+      }
+   }
 
-    my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
-    my $thin = ($section_count == 0) || ($section_count < $min_sections);
+   # Determine extensions
+   if (!$extensions)
+   {
+      $extensions = $lang;
+   }
 
-    my $delegated_only =
-        (!$info{depth0_had_own_rule} && $info{directive_texts} && @{$info{directive_texts}})
-        ? 1
-        : 0;
-    my $directive_text =
-        ($info{directive_texts} && @{$info{directive_texts}}) ? $info{directive_texts}[0] : undef;
+   # Build the .shb output
+   my $date   = strftime('%Y-%m-%d', localtime);
+   my $output = '';
+   $output .= "# Syntax file for $lang\n";
+   $output .= "# Converted from: " . basename($file) . "\n";
+   $output .= "# Conversion date: $date\n";
+   $output .= "\n";
+   $output .= "language: $lang\n";
+   $output .= "extensions: $extensions\n";
 
-    return {
-        text           => $output,
-        section_count  => $section_count,
-        thin           => $thin,
-        delegated_only => $delegated_only,
-        directive_text => $directive_text,
-    };
+   if ($case_fold)
+   {
+      $output .= "case: ignore\n";
+   }
+   $output .= "\n";
+
+   # Write keyword sections
+   for my $group (sort keys %keywords)
+   {
+      my @words = do
+      {
+         my %seen;
+         grep { !$seen{$_}++ } sort @{$keywords{$group}};
+      };
+      next unless @words;
+
+      $output .= "[keyword:$group]\n";
+
+      # Write words in lines of ~80 chars
+      my $line_buf = '';
+      for my $word (@words)
+      {
+         if (length($line_buf) + length($word) + 1 > 78)
+         {
+            $output .= $line_buf . "\n";
+            $line_buf = $word;
+         }
+         elsif ($line_buf eq '')
+         {
+            $line_buf = $word;
+         }
+         else
+         {
+            $line_buf .= " $word";
+         }
+      }
+      $output .= $line_buf . "\n" if $line_buf ne '';
+      $output .= "\n";
+   }
+
+   # Write match sections
+   for my $match (@matches)
+   {
+      $output .= "[match:$match->{group}]\n";
+      $output .= "pattern: $match->{pattern}\n";
+      $output .= "\n";
+   }
+
+   # Write region sections
+   for my $region (@regions)
+   {
+      $output .= "[region:$region->{group}]\n";
+      $output .= "start: $region->{start}\n";
+      $output .= "end: $region->{end}\n";
+      $output .= "escape: $region->{escape}\n" if defined $region->{escape};
+      $output .= "\n";
+   }
+
+   my $section_count = (scalar grep { @{$keywords{$_}} } keys %keywords) + scalar(@matches) + scalar(@regions);
+
+   my $min_sections = defined $cli->{min_sections} ? $cli->{min_sections} : 3;
+   my $thin         = ($section_count == 0) || ($section_count < $min_sections);
+
+   my $delegated_only =
+     (!$info{depth0_had_own_rule} && $info{directive_texts} && @{$info{directive_texts}}) ? 1 :
+     0;
+   my $directive_text =
+     ($info{directive_texts} && @{$info{directive_texts}}) ? $info{directive_texts}[0] : undef;
+
+   return {
+           text           => $output,
+           section_count  => $section_count,
+           thin           => $thin,
+           delegated_only => $delegated_only,
+           directive_text => $directive_text,
+           };
 }
 
 #===========================================================================
@@ -744,77 +743,78 @@ sub _convert_file
 
 sub _resolve_group
 {
-    my ($group, $hi_links, $lang) = @_;
+   my ($group, $hi_links, $lang) = @_;
 
-    # Strip language prefix (e.g., perlConditional -> Conditional)
-    my $stripped = $group;
-    if ($lang)
-    {
-        my $lang_lc = lc($lang);
-        # Try to strip common prefixes
-        if ($stripped =~ /^(?:\Q$lang_lc\E)(.+)$/i)
-        {
-            $stripped = $1;
-        }
-        elsif ($stripped =~ /^(?:java|java[Ss]cript|c|sh|bash|python|ruby|go|sql|yaml|html|css)(.+)$/i)
-        {
-            $stripped = $1;
-        }
-    }
+   # Strip language prefix (e.g., perlConditional -> Conditional)
+   my $stripped = $group;
+   if ($lang)
+   {
+      my $lang_lc = lc($lang);
 
-    # Check if it's already a known group
-    if ($VIM_ALL_GROUPS{$stripped})
-    {
-        return $stripped;
-    }
+      # Try to strip common prefixes
+      if ($stripped =~ /^(?:\Q$lang_lc\E)(.+)$/i)
+      {
+         $stripped = $1;
+      }
+      elsif ($stripped =~ /^(?:java|java[Ss]cript|c|sh|bash|python|ruby|go|sql|yaml|html|css)(.+)$/i)
+      {
+         $stripped = $1;
+      }
+   }
 
-    # Try hi def link resolution
-    my $resolved = $group;
-    my $depth    = 0;
-    while ($depth++ < 10)
-    {
-        if ($hi_links->{$resolved})
-        {
-            $resolved = $hi_links->{$resolved};
-        }
-        elsif ($hi_links->{$stripped})
-        {
-            $resolved = $hi_links->{$stripped};
-            $stripped = $resolved;
-        }
-        else
-        {
-            last;
-        }
+   # Check if it's already a known group
+   if ($VIM_ALL_GROUPS{$stripped})
+   {
+      return $stripped;
+   }
 
-        # Strip prefix again after resolution
-        if ($lang)
-        {
-            my $lang_lc = lc($lang);
-            if ($resolved =~ /^(?:\Q$lang_lc\E)(.+)$/i)
-            {
-                $resolved = $1;
-            }
-            elsif ($resolved =~ /^(?:java|java[Ss]cript|c|sh|bash|python|ruby|go|sql|yaml|html|css)(.+)$/i)
-            {
-                $resolved = $1;
-            }
-        }
+   # Try hi def link resolution
+   my $resolved = $group;
+   my $depth    = 0;
+   while ($depth++ < 10)
+   {
+      if ($hi_links->{$resolved})
+      {
+         $resolved = $hi_links->{$resolved};
+      }
+      elsif ($hi_links->{$stripped})
+      {
+         $resolved = $hi_links->{$stripped};
+         $stripped = $resolved;
+      }
+      else
+      {
+         last;
+      }
 
-        if ($VIM_ALL_GROUPS{$resolved})
-        {
-            return $resolved;
-        }
-    }
+      # Strip prefix again after resolution
+      if ($lang)
+      {
+         my $lang_lc = lc($lang);
+         if ($resolved =~ /^(?:\Q$lang_lc\E)(.+)$/i)
+         {
+            $resolved = $1;
+         }
+         elsif ($resolved =~ /^(?:java|java[Ss]cript|c|sh|bash|python|ruby|go|sql|yaml|html|css)(.+)$/i)
+         {
+            $resolved = $1;
+         }
+      }
 
-    # Try the default mapping table
-    if ($VIM_GROUP_PARENT{$stripped})
-    {
-        return $stripped;    # return the sub-group name (caller knows parent)
-    }
+      if ($VIM_ALL_GROUPS{$resolved})
+      {
+         return $resolved;
+      }
+   }
 
-    # Not recognized
-    return undef;
+   # Try the default mapping table
+   if ($VIM_GROUP_PARENT{$stripped})
+   {
+      return $stripped;    # return the sub-group name (caller knows parent)
+   }
+
+   # Not recognized
+   return undef;
 }
 
 #===========================================================================
@@ -823,133 +823,136 @@ sub _resolve_group
 
 sub _vim_to_perl_regex
 {
-    my ($vim_pat) = @_;
+   my ($vim_pat) = @_;
 
-    # Skip patterns that are too complex
-    if ($vim_pat =~ /\\@[=!<>]/)
-    {
-        return undef;    # Vim lookahead/lookbehind -- too complex
-    }
-    if ($vim_pat =~ /\\%[#\[\(]/)
-    {
-        return undef;    # Vim special atoms -- too complex
-    }
-    if ($vim_pat =~ /\\%[<>]\d/)
-    {
-        return undef;    # Vim column/line anchors -- too complex
-    }
-    if ($vim_pat =~ /\\[pP]\\?\{/)
-    {
-        return undef;    # Vim Unicode property with multi -- too complex
-    }
-    if ($vim_pat =~ /\(\?\[/)
-    {
-        return undef;    # Vim regex collection -- too complex
-    }
+   # Skip patterns that are too complex
+   if ($vim_pat =~ /\\@[=!<>]/)
+   {
+      return undef;    # Vim lookahead/lookbehind -- too complex
+   }
+   if ($vim_pat =~ /\\%[#\[\(]/)
+   {
+      return undef;    # Vim special atoms -- too complex
+   }
+   if ($vim_pat =~ /\\%[<>]\d/)
+   {
+      return undef;    # Vim column/line anchors -- too complex
+   }
+   if ($vim_pat =~ /\\[pP]\\?\{/)
+   {
+      return undef;    # Vim Unicode property with multi -- too complex
+   }
+   if ($vim_pat =~ /\(\?\[/)
+   {
+      return undef;    # Vim regex collection -- too complex
+   }
 
-    my $perl = $vim_pat;
+   my $perl = $vim_pat;
 
-    # \< and \> -- word boundaries
-    $perl =~ s/\\</\\b/g;
-    $perl =~ s/\\>/\\b/g;
+   # \< and \> -- word boundaries
+   $perl =~ s/\\</\\b/g;
+   $perl =~ s/\\>/\\b/g;
 
-    # \%(...\) -- non-capturing group
-    $perl =~ s/\\%\(/(?:/g;
-    $perl =~ s/\\\)/)/g;
+   # \%(...\) -- non-capturing group
+   $perl =~ s/\\%\(/(?:/g;
+   $perl =~ s/\\\)/)/g;
 
-    # \( and \) -- capturing group in Vim basic regex -> non-capturing in Perl
-    $perl =~ s/\\\(/(?:/g;
-    $perl =~ s/\\\)/)/g;
+   # \( and \) -- capturing group in Vim basic regex -> non-capturing in Perl
+   $perl =~ s/\\\(/(?:/g;
+   $perl =~ s/\\\)/)/g;
 
-    # \| -- alternation
-    $perl =~ s/\\\|/|/g;
+   # \| -- alternation
+   $perl =~ s/\\\|/|/g;
 
-    # \zs -- mark start of match (use \K in Perl)
-    $perl =~ s/\\zs/\\K/g;
+   # \zs -- mark start of match (use \K in Perl)
+   $perl =~ s/\\zs/\\K/g;
 
-    # \ze -- mark end of match (use lookahead (?=...) -- approximate)
-    # Just remove it as it's hard to convert without context
-    $perl =~ s/\\ze//g;
+   # \ze -- mark end of match (use lookahead (?=...) -- approximate)
+   # Just remove it as it's hard to convert without context
+   $perl =~ s/\\ze//g;
 
-    # \_s -- whitespace including newline
-    $perl =~ s/\\_s/[\\s\\n]/g;
+   # \_s -- whitespace including newline
+   $perl =~ s/\\_s/[\\s\\n]/g;
 
-    # \_. -- any character including newline
-    $perl =~ s/\\_./ /g;    # approximate with space -- skip
+   # \_. -- any character including newline
+   $perl =~ s/\\_./ /g;    # approximate with space -- skip
 
-    # \i -- identifier character [a-zA-Z0-9_]
-    $perl =~ s/\\i/[a-zA-Z0-9_]/g;
+   # \i -- identifier character [a-zA-Z0-9_]
+   $perl =~ s/\\i/[a-zA-Z0-9_]/g;
 
-    # \I -- identifier character excluding digits [a-zA-Z_]
-    $perl =~ s/\\I/[a-zA-Z_]/g;
+   # \I -- identifier character excluding digits [a-zA-Z_]
+   $perl =~ s/\\I/[a-zA-Z_]/g;
 
-    # \h -- head of word [a-zA-Z_]
-    $perl =~ s/\\h/[a-zA-Z_]/g;
+   # \h -- head of word [a-zA-Z_]
+   $perl =~ s/\\h/[a-zA-Z_]/g;
 
-    # \H -- non-head [^a-zA-Z_]
-    $perl =~ s/\\H/[^a-zA-Z_]/g;
+   # \H -- non-head [^a-zA-Z_]
+   $perl =~ s/\\H/[^a-zA-Z_]/g;
 
-    # \a -- alphabetic [a-zA-Z]
-    $perl =~ s/\\a/[a-zA-Z]/g;
+   # \a -- alphabetic [a-zA-Z]
+   $perl =~ s/\\a/[a-zA-Z]/g;
 
-    # \A -- non-alphabetic [^a-zA-Z]
-    $perl =~ s/\\A/[^a-zA-Z]/g;
+   # \A -- non-alphabetic [^a-zA-Z]
+   $perl =~ s/\\A/[^a-zA-Z]/g;
 
-    # \l -- lowercase [a-z]
-    $perl =~ s/\\l/[a-z]/g;
+   # \l -- lowercase [a-z]
+   $perl =~ s/\\l/[a-z]/g;
 
-    # \L -- non-lowercase [^a-z]
-    $perl =~ s/\\L/[^a-z]/g;
+   # \L -- non-lowercase [^a-z]
+   $perl =~ s/\\L/[^a-z]/g;
 
-    # \u -- uppercase [A-Z]
-    $perl =~ s/\\u/[A-Z]/g;
+   # \u -- uppercase [A-Z]
+   $perl =~ s/\\u/[A-Z]/g;
 
-    # \U -- non-uppercase [^A-Z]
-    $perl =~ s/\\U/[^A-Z]/g;
+   # \U -- non-uppercase [^A-Z]
+   $perl =~ s/\\U/[^A-Z]/g;
 
-    # \o -- octal digit [0-7]
-    $perl =~ s/\\o/[0-7]/g;
+   # \o -- octal digit [0-7]
+   $perl =~ s/\\o/[0-7]/g;
 
-    # \x -- hex digit [0-9a-fA-F]
-    $perl =~ s/\\x(?!\{)/[0-9a-fA-F]/g;
+   # \x -- hex digit [0-9a-fA-F]
+   $perl =~ s/\\x(?!\{)/[0-9a-fA-F]/g;
 
-    # \p -- printable character (only if not followed by { which is Unicode property)
-    $perl =~ s/\\p(?!\{)/[[:print:]]/g;
-    # Also handle \p\{ (Vim multi) -> [[:print:]]{
-    $perl =~ s/\\p\\\{/[[:print:]]{/g;
-    $perl =~ s/\\P\\\{/[^[:print:]]{/g;
+   # \p -- printable character (only if not followed by { which is Unicode property)
+   $perl =~ s/\\p(?!\{)/[[:print:]]/g;
 
-    # \~ -- last substitute string -- skip
-    $perl =~ s/\\~//g;
+   # Also handle \p\{ (Vim multi) -> [[:print:]]{
+   $perl =~ s/\\p\\\{/[[:print:]]{/g;
+   $perl =~ s/\\P\\\{/[^[:print:]]{/g;
 
-    # \%(...\) already handled above
-    # \%(  already handled
+   # \~ -- last substitute string -- skip
+   $perl =~ s/\\~//g;
 
-    # Vim \{n,m} quantifiers -- already valid in Perl as {n,m}
-    # but Vim uses \{n,m} while Perl uses {n,m}
-    # Handle \{-} (Vim non-greedy zero-or-more) -> *? (Perl non-greedy)
-    $perl =~ s/\\\{-}/ *?/g;
-    # Handle \{-\d+,} etc. -- approximate with *?
-    $perl =~ s/\\\{-\d+,\}/ *?/g;
-    $perl =~ s/\\\{-\d+,\d+\}/ *?/g;
-    # Handle \{n,m} -> {n,m}
-    $perl =~ s/\\\{(\d+),(\d+)\}/{$1,$2}/g;
-    $perl =~ s/\\\{(\d+),\}/{$1,}/g;
-    $perl =~ s/\\\{(\d+)\}/{$1}/g;
-    $perl =~ s/\\\{/\{/g;
-    $perl =~ s/\\\}/\}/g;
+   # \%(...\) already handled above
+   # \%(  already handled
 
-    # \= -- optional (0 or 1) -- Perl uses ?
-    $perl =~ s/\\=/\?/g;
+   # Vim \{n,m} quantifiers -- already valid in Perl as {n,m}
+   # but Vim uses \{n,m} while Perl uses {n,m}
+   # Handle \{-} (Vim non-greedy zero-or-more) -> *? (Perl non-greedy)
+   $perl =~ s/\\\{-}/ *?/g;
 
-    # \+ -- one or more -- already valid in Perl
-    $perl =~ s/\\\+/\+/g;
+   # Handle \{-\d+,} etc. -- approximate with *?
+   $perl =~ s/\\\{-\d+,\}/ *?/g;
+   $perl =~ s/\\\{-\d+,\d+\}/ *?/g;
 
-    # Remove Vim-specific flags at end like \c (case insensitive) -- handle separately
-    $perl =~ s/\\c//g;
-    $perl =~ s/\\C//g;
+   # Handle \{n,m} -> {n,m}
+   $perl =~ s/\\\{(\d+),(\d+)\}/{$1,$2}/g;
+   $perl =~ s/\\\{(\d+),\}/{$1,}/g;
+   $perl =~ s/\\\{(\d+)\}/{$1}/g;
+   $perl =~ s/\\\{/\{/g;
+   $perl =~ s/\\\}/\}/g;
 
-    return $perl;
+   # \= -- optional (0 or 1) -- Perl uses ?
+   $perl =~ s/\\=/\?/g;
+
+   # \+ -- one or more -- already valid in Perl
+   $perl =~ s/\\\+/\+/g;
+
+   # Remove Vim-specific flags at end like \c (case insensitive) -- handle separately
+   $perl =~ s/\\c//g;
+   $perl =~ s/\\C//g;
+
+   return $perl;
 }
 
 #===========================================================================
@@ -959,28 +962,28 @@ sub _vim_to_perl_regex
 
 sub _extract_keyword_alternation
 {
-    my ($pattern) = @_;
+   my ($pattern) = @_;
 
-    # Match: \<\%(word1\|word2\|...\)\>
-    # After Vim->Perl conversion this would be: \b(?:word1|word2|...)\b
-    # But we check the Vim pattern before conversion
+   # Match: \<\%(word1\|word2\|...\)\>
+   # After Vim->Perl conversion this would be: \b(?:word1|word2|...)\b
+   # But we check the Vim pattern before conversion
 
-    if ($pattern =~ /^\\<\\%\(((?:\w+(?:\\\|)?)+)\\\)\\>$/)
-    {
-        my $words = $1;
-        my @words = split /\\\|/, $words;
-        return @words if @words > 1;
-    }
+   if ($pattern =~ /^\\<\\%\(((?:\w+(?:\\\|)?)+)\\\)\\>$/)
+   {
+      my $words = $1;
+      my @words = split /\\\|/, $words;
+      return @words if @words > 1;
+   }
 
-    # Also handle simpler: \%(word1\|word2\|...\)  (no word boundaries)
-    if ($pattern =~ /^\\%\(((?:\w+(?:\\\|)?)+)\\\)$/)
-    {
-        my $words = $1;
-        my @words = split /\\\|/, $words;
-        return @words if @words > 1;
-    }
+   # Also handle simpler: \%(word1\|word2\|...\)  (no word boundaries)
+   if ($pattern =~ /^\\%\(((?:\w+(?:\\\|)?)+)\\\)$/)
+   {
+      my $words = $1;
+      my @words = split /\\\|/, $words;
+      return @words if @words > 1;
+   }
 
-    return;
+   return;
 }
 
 #===========================================================================
@@ -989,51 +992,51 @@ sub _extract_keyword_alternation
 
 sub _pattern_is_too_broad
 {
-    my ($pattern) = @_;
+   my ($pattern) = @_;
 
-    # Patterns that match any identifier (too broad -- use keywords instead)
-    return 1 if $pattern =~ /^\[a-zA-Z_\]\\w\*$/;
-    return 1 if $pattern =~ /^\[a-zA-Z_\]\[a-zA-Z0-9_\]\*$/;
-    return 1 if $pattern =~ /^\\w\+$/;
-    return 1 if $pattern =~ /^\\w\*$/;
-    return 1 if $pattern =~ /^\[a-zA-Z_\]\w\*$/;
-    return 1 if $pattern =~ /^\[:alpha:\]\[:alnum:\]\*$/;
+   # Patterns that match any identifier (too broad -- use keywords instead)
+   return 1 if $pattern =~ /^\[a-zA-Z_\]\\w\*$/;
+   return 1 if $pattern =~ /^\[a-zA-Z_\]\[a-zA-Z0-9_\]\*$/;
+   return 1 if $pattern =~ /^\\w\+$/;
+   return 1 if $pattern =~ /^\\w\*$/;
+   return 1 if $pattern =~ /^\[a-zA-Z_\]\w\*$/;
+   return 1 if $pattern =~ /^\[:alpha:\]\[:alnum:\]\*$/;
 
-    # Patterns that start with \s* (whitespace handled by parser separately)
-    return 1 if $pattern =~ /^\\s\*/;
+   # Patterns that start with \s* (whitespace handled by parser separately)
+   return 1 if $pattern =~ /^\\s\*/;
 
-    # Patterns that match empty string
-    return 1 if $pattern eq '';
-    return 1 if $pattern =~ /^\*$/;     # zero or more of nothing
-    return 1 if $pattern =~ /^\(\)$/;   # empty group
+   # Patterns that match empty string
+   return 1 if $pattern eq '';
+   return 1 if $pattern =~ /^\*$/;      # zero or more of nothing
+   return 1 if $pattern =~ /^\(\)$/;    # empty group
 
-    # Patterns that are just a single character class matching almost anything
-    return 1 if $pattern =~ /^\.$/;       # any single char
-    return 1 if $pattern =~ /^\.\*$/;     # match everything
-    return 1 if $pattern =~ /^\.\+$/;     # match everything (non-empty)
+   # Patterns that are just a single character class matching almost anything
+   return 1 if $pattern =~ /^\.$/;      # any single char
+   return 1 if $pattern =~ /^\.\*$/;    # match everything
+   return 1 if $pattern =~ /^\.\+$/;    # match everything (non-empty)
 
-    # Patterns that match any non-whitespace (too broad)
-    return 1 if $pattern =~ /^\\S\+$/;
-    return 1 if $pattern =~ /^\\S\*$/;
+   # Patterns that match any non-whitespace (too broad)
+   return 1 if $pattern =~ /^\\S\+$/;
+   return 1 if $pattern =~ /^\\S\*$/;
 
-    # Reject patterns that start with | (can match empty string -> infinite loop)
-    return 1 if $pattern =~ /^\|/;
+   # Reject patterns that start with | (can match empty string -> infinite loop)
+   return 1 if $pattern =~ /^\|/;
 
-    # Reject patterns containing Perl special chars that may cause issues
-    # (likely from unconverted Vim regex)
-    return 1 if $pattern =~ /\\[cC]/;             # Vim case-insensitive flags
-    return 1 if $pattern =~ /\\%\#/;              # Vim file position
-    return 1 if $pattern =~ /\\%\[/;              # Vim regex collection
-    return 1 if $pattern =~ /\\@[=!<>]/;          # Vim lookaround
-    return 1 if $pattern =~ /\\_\./;              # Vim any-char-including-newline
-    return 1 if $pattern =~ /\\_s/;               # Vim whitespace-including-newline
+   # Reject patterns containing Perl special chars that may cause issues
+   # (likely from unconverted Vim regex)
+   return 1 if $pattern =~ /\\[cC]/;       # Vim case-insensitive flags
+   return 1 if $pattern =~ /\\%\#/;        # Vim file position
+   return 1 if $pattern =~ /\\%\[/;        # Vim regex collection
+   return 1 if $pattern =~ /\\@[=!<>]/;    # Vim lookaround
+   return 1 if $pattern =~ /\\_\./;        # Vim any-char-including-newline
+   return 1 if $pattern =~ /\\_s/;         # Vim whitespace-including-newline
 
-    # Reject patterns that are just single characters (too broad)
-    return 1 if $pattern =~ /^\[\^?\\?.\]$/;      # Single char class like [x]
-    return 1 if $pattern =~ /^\[\^?\\?..\]$/;     # Two-char class like [xy]
-    return 1 if $pattern =~ /^\[\^?\\?...\]$/;    # Three-char class like [xyz]
+   # Reject patterns that are just single characters (too broad)
+   return 1 if $pattern =~ /^\[\^?\\?.\]$/;      # Single char class like [x]
+   return 1 if $pattern =~ /^\[\^?\\?..\]$/;     # Two-char class like [xy]
+   return 1 if $pattern =~ /^\[\^?\\?...\]$/;    # Three-char class like [xyz]
 
-    return 0;
+   return 0;
 }
 
 #===========================================================================
@@ -1042,28 +1045,28 @@ sub _pattern_is_too_broad
 
 sub _vim_region_delim_to_literal
 {
-    my ($delim) = @_;
+   my ($delim) = @_;
 
-    # If it's a simple literal string (no special Vim regex), return as-is
-    # Common cases: ", ', /*, */, //, #, etc.
+   # If it's a simple literal string (no special Vim regex), return as-is
+   # Common cases: ", ', /*, */, //, #, etc.
 
-    # Skip if it contains complex Vim regex
-    if ($delim =~ /\\[<>%\@zZ]/)
-    {
-        return undef;
-    }
+   # Skip if it contains complex Vim regex
+   if ($delim =~ /\\[<>%\@zZ]/)
+   {
+      return undef;
+   }
 
-    # Unescape simple backslash sequences
-    $delim =~ s/\\\\/\\/g;
-    $delim =~ s/\\"/"/g;
-    $delim =~ s/\\'/'/g;
+   # Unescape simple backslash sequences
+   $delim =~ s/\\\\/\\/g;
+   $delim =~ s/\\"/"/g;
+   $delim =~ s/\\'/'/g;
 
-    # Remove anchors like ^ that don't make sense as literals
-    # but keep the rest
-    $delim =~ s/^\^//;
+   # Remove anchors like ^ that don't make sense as literals
+   # but keep the rest
+   $delim =~ s/^\^//;
 
-    return $delim if length $delim;
-    return undef;
+   return $delim if length $delim;
+   return undef;
 }
 
 __END__
@@ -1105,7 +1108,7 @@ Override the language name in the output file.  Only valid with a single input f
 
 Follow C<runtime!>/C<runtime>, C<source>, and C<syn include> directives found
 in the Vim source and splice the referenced file's lines into the input
-before conversion (default: B<on>). This fixes "delegating" Vim syntax files
+before conversion (default: B<on>) . This fixes "delegating" Vim syntax files
 that pull all of their rules from another file (e.g. C<bash.vim> delegates to
 C<sh.vim> via C<runtime! syntax/sh.vim>) and would otherwise produce an
 effectively empty C<.shb>. Resolution order for a referenced file: relative

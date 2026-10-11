@@ -17,63 +17,61 @@ use Syntax::Highlight::Basic::Output::Ansi;
 
 sub new
 {
-    my ($class, %opts) = @_;
+   my ($class, %opts) = @_;
 
-    my $self = {
-        options => {
-            syntax_dirs => $opts{syntax_dirs} || [],
-            format      => $opts{format}      || 'html',
-            wrap        => $opts{wrap}        || 0,
-            css_class   => $opts{css_class},
-            colors      => $opts{colors},
-        },
-    };
+   my $self = {
+               options => {
+                           syntax_dirs => $opts{syntax_dirs} || [],
+                           format      => $opts{format}      || 'html',
+                           wrap        => $opts{wrap}        || 0,
+                           css_class   => $opts{css_class},
+                           colors      => $opts{colors},
+                 },
+                 };
 
-    bless $self, $class;
-    return $self;
+   bless $self, $class;
+   return $self;
 }
 
 sub highlight
 {
-    my ($self, $code, $language, $opts) = @_;
+   my ($self, $code, $language, $opts) = @_;
 
-    my $format    = $opts->{format} || $self->{options}{format};
-    my $wrap      = exists $opts->{wrap} ? $opts->{wrap} : $self->{options}{wrap};
-    my $css_class = exists $opts->{css_class} ? $opts->{css_class} : $self->{options}{css_class};
-    my $colors    = exists $opts->{colors} ? $opts->{colors} : $self->{options}{colors};
+   my $format    = $opts->{format} || $self->{options}{format};
+   my $wrap      = exists $opts->{wrap}      ? $opts->{wrap}      : $self->{options}{wrap};
+   my $css_class = exists $opts->{css_class} ? $opts->{css_class} : $self->{options}{css_class};
+   my $colors    = exists $opts->{colors}    ? $opts->{colors}    : $self->{options}{colors};
 
-    # Create parser
-    my $parser = Syntax::Highlight::Basic::Parser->new(
-        language    => $language,
-        syntax_dirs => $self->{options}{syntax_dirs},
-    );
+   # Create parser
+   my $parser = Syntax::Highlight::Basic::Parser->new(language    => $language,
+                                                      syntax_dirs => $self->{options}{syntax_dirs},);
 
-    # Parse code into tokens
-    my $tokens = $parser->parse($code);
+   # Parse code into tokens
+   my $tokens = $parser->parse($code);
 
-    # Build output constructor args
-    my %output_args;
-    $output_args{wrap}      = $wrap if defined $wrap;
-    $output_args{css_class} = $css_class if defined $css_class;
-    $output_args{colors}    = $colors if defined $colors && ref $colors eq 'HASH';
+   # Build output constructor args
+   my %output_args;
+   $output_args{wrap}      = $wrap      if defined $wrap;
+   $output_args{css_class} = $css_class if defined $css_class;
+   $output_args{colors}    = $colors    if defined $colors && ref $colors eq 'HASH';
 
-    # Create output module based on format
-    my $output;
-    if (defined $format && $format eq 'pygments')
-    {
-        $output = Syntax::Highlight::Basic::Output::Pygments->new(%output_args);
-    }
-    elsif (defined $format && $format eq 'ansi')
-    {
-        $output = Syntax::Highlight::Basic::Output::Ansi->new(%output_args);
-    }
-    else
-    {
-        # Default to HTML (also catches 'html' and unknown formats)
-        $output = Syntax::Highlight::Basic::Output::HTML->new(%output_args);
-    }
+   # Create output module based on format
+   my $output;
+   if (defined $format && $format eq 'pygments')
+   {
+      $output = Syntax::Highlight::Basic::Output::Pygments->new(%output_args);
+   }
+   elsif (defined $format && $format eq 'ansi')
+   {
+      $output = Syntax::Highlight::Basic::Output::Ansi->new(%output_args);
+   }
+   else
+   {
+      # Default to HTML (also catches 'html' and unknown formats)
+      $output = Syntax::Highlight::Basic::Output::HTML->new(%output_args);
+   }
 
-    return $output->convert($tokens);
+   return $output->convert($tokens);
 }
 
 1;

@@ -9,43 +9,45 @@ use warnings;
 #===========================================================================
 
 my %PYGMENTS_CLASS = (
-    # Sub-groups (take priority over parent groups)
-    'String'         => 's',
-    'Character'      => 'sc',
-    'Number'         => 'm',
-    'Boolean'        => 'kc',
-    'Float'          => 'mf',
-    'Function'       => 'nf',
-    'Conditional'    => 'k',
-    'Repeat'         => 'k',
-    'Label'          => 'nl',
-    'Operator'       => 'o',
-    'Keyword'        => 'k',
-    'Exception'      => 'k',
-    'Include'        => 'cp',
-    'Define'         => 'cp',
-    'Macro'          => 'cp',
-    'PreCondit'      => 'cp',
-    'StorageClass'   => 'kd',
-    'Structure'      => 'k',
-    'Typedef'        => 'k',
-    'Tag'            => 'nt',
-    'SpecialChar'    => 'se',
-    'Delimiter'      => 'p',
-    'SpecialComment' => 'cs',
-    'Debug'          => 'cs',
-    # Parent groups (used when sub_group is undef)
-    'Comment'        => 'c',
-    'Constant'       => 'n',
-    'Identifier'     => 'n',
-    'Statement'      => 'k',
-    'PreProc'        => 'cp',
-    'Type'           => 'kt',
-    'Special'        => 'p',
-    'Underlined'     => 'ge',
-    'Error'          => 'err',
-    'Todo'           => 'c1',
-);
+
+   # Sub-groups (take priority over parent groups)
+   'String'         => 's',
+   'Character'      => 'sc',
+   'Number'         => 'm',
+   'Boolean'        => 'kc',
+   'Float'          => 'mf',
+   'Function'       => 'nf',
+   'Conditional'    => 'k',
+   'Repeat'         => 'k',
+   'Label'          => 'nl',
+   'Operator'       => 'o',
+   'Keyword'        => 'k',
+   'Exception'      => 'k',
+   'Include'        => 'cp',
+   'Define'         => 'cp',
+   'Macro'          => 'cp',
+   'PreCondit'      => 'cp',
+   'StorageClass'   => 'kd',
+   'Structure'      => 'k',
+   'Typedef'        => 'k',
+   'Tag'            => 'nt',
+   'SpecialChar'    => 'se',
+   'Delimiter'      => 'p',
+   'SpecialComment' => 'cs',
+   'Debug'          => 'cs',
+
+   # Parent groups (used when sub_group is undef)
+   'Comment'    => 'c',
+   'Constant'   => 'n',
+   'Identifier' => 'n',
+   'Statement'  => 'k',
+   'PreProc'    => 'cp',
+   'Type'       => 'kt',
+   'Special'    => 'p',
+   'Underlined' => 'ge',
+   'Error'      => 'err',
+   'Todo'       => 'c1',
+   );
 
 #===========================================================================
 # Constructor
@@ -53,15 +55,15 @@ my %PYGMENTS_CLASS = (
 
 sub new
 {
-    my ($class, %opts) = @_;
+   my ($class, %opts) = @_;
 
-    my $self = {
-        wrap      => $opts{wrap} || 0,
-        css_class => $opts{css_class} || 'highlight',
-    };
+   my $self = {
+               wrap      => $opts{wrap}      || 0,
+               css_class => $opts{css_class} || 'highlight',
+               };
 
-    bless $self, $class;
-    return $self;
+   bless $self, $class;
+   return $self;
 }
 
 #===========================================================================
@@ -70,45 +72,45 @@ sub new
 
 sub convert
 {
-    my ($self, $parse_result) = @_;
+   my ($self, $parse_result) = @_;
 
-    my @lines;
-    for my $line_tokens (@$parse_result)
-    {
-        my $line_html = '';
-        for my $token (@$line_tokens)
-        {
-            my $escaped = _html_escape($token->{text});
+   my @lines;
+   for my $line_tokens (@$parse_result)
+   {
+      my $line_html = '';
+      for my $token (@$line_tokens)
+      {
+         my $escaped = _html_escape($token->{text});
 
-            if ($token->{class} eq 'whitespace' || $token->{class} eq 'text')
+         if ($token->{class} eq 'whitespace' || $token->{class} eq 'text')
+         {
+            $line_html .= $escaped;
+         }
+         else
+         {
+            my $css = _resolve_css_class($token->{class}, $token->{sub_group});
+            if ($css)
             {
-                $line_html .= $escaped;
+               $line_html .= '<span class="' . $css . '">' . $escaped . '</span>';
             }
             else
             {
-                my $css = _resolve_css_class($token->{class}, $token->{sub_group});
-                if ($css)
-                {
-                    $line_html .= '<span class="' . $css . '">' . $escaped . '</span>';
-                }
-                else
-                {
-                    $line_html .= $escaped;
-                }
+               $line_html .= $escaped;
             }
-        }
-        push @lines, $line_html;
-    }
+         }
+      }
+      push @lines, $line_html;
+   }
 
-    my $result = join("\n", @lines);
+   my $result = join("\n", @lines);
 
-    if ($self->{wrap})
-    {
-        my $css = $self->{css_class};
-        return '<div class="' . $css . '"><pre><code>' . $result . '</code></pre></div>';
-    }
+   if ($self->{wrap})
+   {
+      my $css = $self->{css_class};
+      return '<div class="' . $css . '"><pre><code>' . $result . '</code></pre></div>';
+   }
 
-    return $result;
+   return $result;
 }
 
 #===========================================================================
@@ -117,14 +119,14 @@ sub convert
 
 sub _html_escape
 {
-    my ($text) = @_;
+   my ($text) = @_;
 
-    $text =~ s/&/&amp;/g;
-    $text =~ s/</&lt;/g;
-    $text =~ s/>/&gt;/g;
-    $text =~ s/"/&quot;/g;
+   $text =~ s/&/&amp;/g;
+   $text =~ s/</&lt;/g;
+   $text =~ s/>/&gt;/g;
+   $text =~ s/"/&quot;/g;
 
-    return $text;
+   return $text;
 }
 
 #===========================================================================
@@ -133,21 +135,21 @@ sub _html_escape
 
 sub _resolve_css_class
 {
-    my ($class, $sub_group) = @_;
+   my ($class, $sub_group) = @_;
 
-    # Sub-group takes priority
-    if (defined $sub_group && exists $PYGMENTS_CLASS{$sub_group})
-    {
-        return $PYGMENTS_CLASS{$sub_group};
-    }
+   # Sub-group takes priority
+   if (defined $sub_group && exists $PYGMENTS_CLASS{$sub_group})
+   {
+      return $PYGMENTS_CLASS{$sub_group};
+   }
 
-    # Fall back to parent group
-    if (exists $PYGMENTS_CLASS{$class})
-    {
-        return $PYGMENTS_CLASS{$class};
-    }
+   # Fall back to parent group
+   if (exists $PYGMENTS_CLASS{$class})
+   {
+      return $PYGMENTS_CLASS{$class};
+   }
 
-    return '';
+   return '';
 }
 
 1;
