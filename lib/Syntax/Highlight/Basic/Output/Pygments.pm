@@ -65,7 +65,7 @@ sub new
 }
 
 #===========================================================================
-# convert($parse_result) — render tokens as Pygments-classed HTML
+# convert($parse_result) -- render tokens as Pygments-classed HTML
 #===========================================================================
 
 sub convert
@@ -112,7 +112,7 @@ sub convert
 }
 
 #===========================================================================
-# _html_escape($text) — escape HTML entities
+# _html_escape($text) -- escape HTML entities
 #===========================================================================
 
 sub _html_escape
@@ -128,7 +128,7 @@ sub _html_escape
 }
 
 #===========================================================================
-# _resolve_css_class($class, $sub_group) — map Vim group to Pygments class
+# _resolve_css_class($class, $sub_group) -- map Vim group to Pygments class
 #===========================================================================
 
 sub _resolve_css_class
@@ -220,53 +220,53 @@ The following Vim highlight groups are mapped to Pygments CSS classes:
 
 =over 4
 
-=item C<String> → C<s>
+=item C<String> -> C<s>
 
-=item C<Character> → C<sc>
+=item C<Character> -> C<sc>
 
-=item C<Number> → C<m>
+=item C<Number> -> C<m>
 
-=item C<Boolean> → C<kc>
+=item C<Boolean> -> C<kc>
 
-=item C<Float> → C<mf>
+=item C<Float> -> C<mf>
 
-=item C<Function> → C<nf>
+=item C<Function> -> C<nf>
 
-=item C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<Structure>, C<Typedef> → C<k>
+=item C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<Structure>, C<Typedef> -> C<k>
 
-=item C<Label> → C<nl>
+=item C<Label> -> C<nl>
 
-=item C<Operator> → C<o>
+=item C<Operator> -> C<o>
 
-=item C<Include>, C<Define>, C<Macro>, C<PreCondit> → C<cp>
+=item C<Include>, C<Define>, C<Macro>, C<PreCondit> -> C<cp>
 
-=item C<StorageClass> → C<kd>
+=item C<StorageClass> -> C<kd>
 
-=item C<Tag> → C<nt>
+=item C<Tag> -> C<nt>
 
-=item C<SpecialChar> → C<se>
+=item C<SpecialChar> -> C<se>
 
-=item C<Delimiter> → C<p>
+=item C<Delimiter> -> C<p>
 
-=item C<SpecialComment>, C<Debug> → C<cs>
+=item C<SpecialComment>, C<Debug> -> C<cs>
 
-=item C<Comment> → C<c>
+=item C<Comment> -> C<c>
 
-=item C<Constant>, C<Identifier> → C<n>
+=item C<Constant>, C<Identifier> -> C<n>
 
-=item C<Statement> → C<k>
+=item C<Statement> -> C<k>
 
-=item C<PreProc> → C<cp>
+=item C<PreProc> -> C<cp>
 
-=item C<Type> → C<kt>
+=item C<Type> -> C<kt>
 
-=item C<Special> → C<p>
+=item C<Special> -> C<p>
 
-=item C<Underlined> → C<ge>
+=item C<Underlined> -> C<ge>
 
-=item C<Error> → C<err>
+=item C<Error> -> C<err>
 
-=item C<Todo> → C<c1>
+=item C<Todo> -> C<c1>
 
 =back
 

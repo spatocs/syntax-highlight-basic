@@ -84,7 +84,7 @@ sub new
 }
 
 #===========================================================================
-# convert($parse_result) — render tokens as inline-styled HTML
+# convert($parse_result) -- render tokens as inline-styled HTML
 #===========================================================================
 
 sub convert
@@ -137,7 +137,7 @@ sub convert
 }
 
 #===========================================================================
-# _html_escape($text) — escape HTML entities
+# _html_escape($text) -- escape HTML entities
 #===========================================================================
 
 sub _html_escape
@@ -158,7 +158,7 @@ sub _html_escape
 }
 
 #===========================================================================
-# _resolve_color($class, $sub_group, $colors) — resolve color for a token
+# _resolve_color($class, $sub_group, $colors) -- resolve color for a token
 #===========================================================================
 
 sub _resolve_color
@@ -181,7 +181,7 @@ sub _resolve_color
 }
 
 #===========================================================================
-# _build_style($class, $sub_group, $colors) — build inline style attribute
+# _build_style($class, $sub_group, $colors) -- build inline style attribute
 #===========================================================================
 
 sub _build_style
@@ -299,33 +299,33 @@ The following default colors are used for each Vim highlight group:
 
 =over 4
 
-=item C<String>, C<Character>, C<Special> → C<#4070a0>
+=item C<String>, C<Character>, C<Special> -> C<#4070a0>
 
-=item C<Number>, C<Float>, C<Constant> → C<#40a070>
+=item C<Number>, C<Float>, C<Constant> -> C<#40a070>
 
-=item C<Boolean>, C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<StorageClass>, C<Structure>, C<Typedef>, C<Tag>, C<Statement> → C<#008000> (bold)
+=item C<Boolean>, C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<StorageClass>, C<Structure>, C<Typedef>, C<Tag>, C<Statement> -> C<#008000> (bold)
 
-=item C<Function> → C<#06287e>
+=item C<Function> -> C<#06287e>
 
-=item C<Label> → C<#a0a000>
+=item C<Label> -> C<#a0a000>
 
-=item C<Operator>, C<Delimiter> → C<#666666>
+=item C<Operator>, C<Delimiter> -> C<#666666>
 
-=item C<Include>, C<Define>, C<Macro>, C<PreCondit>, C<PreProc> → C<#bc7a00>
+=item C<Include>, C<Define>, C<Macro>, C<PreCondit>, C<PreProc> -> C<#bc7a00>
 
-=item C<SpecialChar> → C<#bb6622>
+=item C<SpecialChar> -> C<#bb6622>
 
-=item C<SpecialComment>, C<Debug> → C<#cc2222>
+=item C<SpecialComment>, C<Debug> -> C<#cc2222>
 
-=item C<Comment>, C<Todo> → C<#60a0b0>
+=item C<Comment>, C<Todo> -> C<#60a0b0>
 
-=item C<Identifier> → C<#19177c>
+=item C<Identifier> -> C<#19177c>
 
-=item C<Type> → C<#902000>
+=item C<Type> -> C<#902000>
 
-=item C<Underlined> → C<#000080>
+=item C<Underlined> -> C<#000080>
 
-=item C<Error> → C<#ff0000>
+=item C<Error> -> C<#ff0000>
 
 =back
 

@@ -73,7 +73,7 @@ sub new
 }
 
 #===========================================================================
-# convert($parse_result) — render tokens with ANSI escape codes
+# convert($parse_result) -- render tokens with ANSI escape codes
 #===========================================================================
 
 sub convert
@@ -121,7 +121,7 @@ sub convert
 }
 
 #===========================================================================
-# _resolve_ansi_color($class, $sub_group, $colors) — resolve ANSI color entry
+# _resolve_ansi_color($class, $sub_group, $colors) -- resolve ANSI color entry
 #===========================================================================
 
 sub _resolve_ansi_color
@@ -193,9 +193,9 @@ group names.  Values are hash references with two fields:
 
 =over 4
 
-=item C<color> — ANSI 256-color index (0–255)
+=item C<color> -- ANSI 256-color index (0-255)
 
-=item C<bold> — 1 for bold, 0 for normal weight
+=item C<bold> -- 1 for bold, 0 for normal weight
 
 =back
 
@@ -241,33 +241,33 @@ The following default ANSI 256-color indices are used:
 
 =over 4
 
-=item C<String>, C<Character>, C<Special> → 67 (blue-ish)
+=item C<String>, C<Character>, C<Special> -> 67 (blue-ish)
 
-=item C<Number>, C<Float>, C<Constant> → 71 (green-ish)
+=item C<Number>, C<Float>, C<Constant> -> 71 (green-ish)
 
-=item C<Boolean>, C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<StorageClass>, C<Structure>, C<Typedef>, C<Tag>, C<Statement> → 28 bold (green bold)
+=item C<Boolean>, C<Conditional>, C<Repeat>, C<Keyword>, C<Exception>, C<StorageClass>, C<Structure>, C<Typedef>, C<Tag>, C<Statement> -> 28 bold (green bold)
 
-=item C<Function> → 33 (light blue)
+=item C<Function> -> 33 (light blue)
 
-=item C<Label> → 136 (olive)
+=item C<Label> -> 136 (olive)
 
-=item C<Operator>, C<Delimiter> → 102 (gray)
+=item C<Operator>, C<Delimiter> -> 102 (gray)
 
-=item C<Include>, C<Define>, C<Macro>, C<PreCondit>, C<PreProc> → 130 (brown)
+=item C<Include>, C<Define>, C<Macro>, C<PreCondit>, C<PreProc> -> 130 (brown)
 
-=item C<SpecialChar> → 130 bold (brown bold)
+=item C<SpecialChar> -> 130 bold (brown bold)
 
-=item C<SpecialComment>, C<Debug> → 160 bold (red bold)
+=item C<SpecialComment>, C<Debug> -> 160 bold (red bold)
 
-=item C<Comment>, C<Todo> → 73 (teal)
+=item C<Comment>, C<Todo> -> 73 (teal)
 
-=item C<Identifier> → 33 (light blue)
+=item C<Identifier> -> 33 (light blue)
 
-=item C<Type> → 88 (dark red)
+=item C<Type> -> 88 (dark red)
 
-=item C<Underlined> → 4 (blue)
+=item C<Underlined> -> 4 (blue)
 
-=item C<Error> → 196 (bright red)
+=item C<Error> -> 196 (bright red)
 
 =back
 

@@ -9,7 +9,7 @@ use lib 'lib';
 use Syntax::Highlight::Basic::Parser;
 
 #===========================================================================
-# Edge Case Tests — false positive prevention
+# Edge Case Tests -- false positive prevention
 # These test that keywords don't match inside longer words.
 #===========================================================================
 
@@ -139,8 +139,8 @@ not_keyword('java', 'String before = "hi"', 'before',
 # Ruby edge cases
 #===========================================================================
 
-# "if" inside "elsif" — special case: "if" IS inside "elsif"
-# This is a known limitation — "elsif" is a keyword but "if" substring may match
+# "if" inside "elsif" -- special case: "if" IS inside "elsif"
+# This is a known limitation -- "elsif" is a keyword but "if" substring may match
 # We test that "elsif" itself is recognized correctly
 {
     my $t = tokens('ruby', 'elsif true');

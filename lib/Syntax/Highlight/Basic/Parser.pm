@@ -104,7 +104,7 @@ sub new
 }
 
 #===========================================================================
-# parse($code) — tokenize source code
+# parse($code) -- tokenize source code
 #===========================================================================
 
 sub parse
@@ -180,7 +180,7 @@ sub parse
             }
             else
             {
-                # No match — consume one character
+                # No match -- consume one character
                 push @$tokens, { class => 'text', sub_group => undef, text => substr($remaining, 0, 1) };
                 $pos += 1;
             }
@@ -194,7 +194,7 @@ sub parse
 }
 
 #===========================================================================
-# _find_best_match — find the best token match at the current position
+# _find_best_match -- find the best token match at the current position
 #===========================================================================
 
 sub _find_best_match
@@ -257,7 +257,7 @@ sub _find_best_match
     }
 
     # Try keyword matching (priority 1)
-    # Must be a whole word — check word boundaries before and after
+    # Must be a whole word -- check word boundaries before and after
     my $at_word_start = ($pos == 0 || substr($line, $pos - 1, 1) !~ /\w/);
     if ($at_word_start && $remaining =~ /^(\w+)(?:\W|\z)/)
     {
@@ -283,7 +283,7 @@ sub _find_best_match
 }
 
 #===========================================================================
-# _find_region_end — find the end delimiter in a string, respecting escapes
+# _find_region_end -- find the end delimiter in a string, respecting escapes
 #===========================================================================
 
 sub _find_region_end
@@ -318,7 +318,7 @@ sub _find_region_end
 }
 
 #===========================================================================
-# _merge_text_tokens — merge consecutive 'text' tokens
+# _merge_text_tokens -- merge consecutive 'text' tokens
 #===========================================================================
 
 sub _merge_text_tokens
@@ -342,7 +342,7 @@ sub _merge_text_tokens
 }
 
 #===========================================================================
-# _load_shb_file — parse a .shb file and populate the parser data structures
+# _load_shb_file -- parse a .shb file and populate the parser data structures
 #===========================================================================
 
 sub _load_shb_file
@@ -476,7 +476,7 @@ sub _load_shb_file
 }
 
 #===========================================================================
-# _find_shb_file — locate a .shb file for the given language
+# _find_shb_file -- locate a .shb file for the given language
 #===========================================================================
 
 sub _find_shb_file
@@ -515,7 +515,7 @@ sub _find_shb_file
 }
 
 #===========================================================================
-# _find_dev_share_dir — find share/syntax/ during development
+# _find_dev_share_dir -- find share/syntax/ during development
 #===========================================================================
 
 sub _find_dev_share_dir
@@ -531,7 +531,7 @@ sub _find_dev_share_dir
 }
 
 #===========================================================================
-# _resolve_group — resolve a Vim group name to (parent, sub_group)
+# _resolve_group -- resolve a Vim group name to (parent, sub_group)
 #===========================================================================
 
 sub _resolve_group
@@ -550,12 +550,12 @@ sub _resolve_group
         return ($group_name, undef);
     }
 
-    # Unknown — treat as a parent group
+    # Unknown -- treat as a parent group
     return ($group_name, undef);
 }
 
 #===========================================================================
-# _resolve_pygments_name — resolve Pygments alias to Vim language name
+# _resolve_pygments_name -- resolve Pygments alias to Vim language name
 #===========================================================================
 
 my $_pygments_map = undef;
@@ -593,7 +593,7 @@ sub _resolve_pygments_name
 }
 
 #===========================================================================
-# _find_pygments_map — locate the pygments-languages.txt file
+# _find_pygments_map -- locate the pygments-languages.txt file
 #===========================================================================
 
 sub _find_pygments_map
@@ -705,9 +705,9 @@ Special class values:
 
 =over 4
 
-=item C<'whitespace'> — spaces and tabs
+=item C<'whitespace'> -- spaces and tabs
 
-=item C<'text'> — unrecognized text
+=item C<'text'> -- unrecognized text
 
 =back
 

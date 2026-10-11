@@ -38,7 +38,7 @@ sub find_token {
 }
 
 #===========================================================================
-# Fallback string detection — double quotes
+# Fallback string detection -- double quotes
 #===========================================================================
 
 {
@@ -49,7 +49,7 @@ sub find_token {
 }
 
 #===========================================================================
-# Fallback string detection — single quotes
+# Fallback string detection -- single quotes
 #===========================================================================
 
 {

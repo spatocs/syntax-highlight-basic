@@ -10,7 +10,7 @@ use Syntax::Highlight::Basic::Parser;
 use Syntax::Highlight::Basic::Output::HTML;
 
 #===========================================================================
-# Output::HTML Tests — inline style rendering
+# Output::HTML Tests -- inline style rendering
 #===========================================================================
 
 # HTML entity helpers (chr-based to survive tool pipeline)
@@ -78,7 +78,7 @@ sub convert_line {
 }
 
 #===========================================================================
-# Basic convert() — keyword highlighting
+# Basic convert() -- keyword highlighting
 #===========================================================================
 
 {

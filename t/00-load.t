@@ -7,7 +7,7 @@ use warnings;
 use Test::More tests => 7;
 
 #===========================================================================
-# Smoke Tests — module loads, basic API
+# Smoke Tests -- module loads, basic API
 #===========================================================================
 
 Main:

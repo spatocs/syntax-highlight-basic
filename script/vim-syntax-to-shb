@@ -14,7 +14,7 @@ use POSIX qw(strftime);
 use constant MAX_INCLUDE_DEPTH => 5;
 
 #===========================================================================
-# vim-syntax-to-shb — Convert Vim .vim syntax files to .shb data files
+# vim-syntax-to-shb -- Convert Vim .vim syntax files to .shb data files
 #===========================================================================
 
 # Default Vim sub-group to parent group mapping
@@ -160,7 +160,7 @@ sub _run
 
         my $outfile = "$cli->{output_dir}/$lang.shb";
 
-        # Check if output file is curated — skip unless --force
+        # Check if output file is curated -- skip unless --force
         if (!$cli->{force} && -f $outfile && _is_curated($outfile))
         {
             warn "Skipping curated file: $outfile (use --force to override)\n";
@@ -510,7 +510,7 @@ sub _convert_file
             # Allow contains=@Spell but skip other contains= values
             next if $rest =~ /\bcontains=/ && $rest !~ /\bcontains=\@Spell\b/;
 
-            # Extract the pattern — try quoted forms
+            # Extract the pattern -- try quoted forms
             my $pattern = undef;
             if ($rest =~ /^"((?:[^"\\]|\\.)*)"/s)
             {
@@ -544,7 +544,7 @@ sub _convert_file
             my $perl_pattern = _vim_to_perl_regex($pattern);
             next unless defined $perl_pattern;
 
-            # Validate the pattern (suppress regex warnings — eval catches errors)
+            # Validate the pattern (suppress regex warnings -- eval catches errors)
             my $valid;
             {
                 no warnings 'regexp';
@@ -578,7 +578,7 @@ sub _convert_file
         {
             my ($group, $rest) = ($1, $2);
 
-            # Extract regions even if they have contains=/matchgroup= — start/end are still valid
+            # Extract regions even if they have contains=/matchgroup= -- start/end are still valid
 
             # Extract start=
             my $start = undef;
@@ -828,124 +828,124 @@ sub _vim_to_perl_regex
     # Skip patterns that are too complex
     if ($vim_pat =~ /\\@[=!<>]/)
     {
-        return undef;    # Vim lookahead/lookbehind — too complex
+        return undef;    # Vim lookahead/lookbehind -- too complex
     }
     if ($vim_pat =~ /\\%[#\[\(]/)
     {
-        return undef;    # Vim special atoms — too complex
+        return undef;    # Vim special atoms -- too complex
     }
     if ($vim_pat =~ /\\%[<>]\d/)
     {
-        return undef;    # Vim column/line anchors — too complex
+        return undef;    # Vim column/line anchors -- too complex
     }
     if ($vim_pat =~ /\\[pP]\\?\{/)
     {
-        return undef;    # Vim Unicode property with multi — too complex
+        return undef;    # Vim Unicode property with multi -- too complex
     }
     if ($vim_pat =~ /\(\?\[/)
     {
-        return undef;    # Vim regex collection — too complex
+        return undef;    # Vim regex collection -- too complex
     }
 
     my $perl = $vim_pat;
 
-    # \< and \> — word boundaries
+    # \< and \> -- word boundaries
     $perl =~ s/\\</\\b/g;
     $perl =~ s/\\>/\\b/g;
 
-    # \%(...\) — non-capturing group
+    # \%(...\) -- non-capturing group
     $perl =~ s/\\%\(/(?:/g;
     $perl =~ s/\\\)/)/g;
 
-    # \( and \) — capturing group in Vim basic regex → non-capturing in Perl
+    # \( and \) -- capturing group in Vim basic regex -> non-capturing in Perl
     $perl =~ s/\\\(/(?:/g;
     $perl =~ s/\\\)/)/g;
 
-    # \| — alternation
+    # \| -- alternation
     $perl =~ s/\\\|/|/g;
 
-    # \zs — mark start of match (use \K in Perl)
+    # \zs -- mark start of match (use \K in Perl)
     $perl =~ s/\\zs/\\K/g;
 
-    # \ze — mark end of match (use lookahead (?=...) — approximate)
+    # \ze -- mark end of match (use lookahead (?=...) -- approximate)
     # Just remove it as it's hard to convert without context
     $perl =~ s/\\ze//g;
 
-    # \_s — whitespace including newline
+    # \_s -- whitespace including newline
     $perl =~ s/\\_s/[\\s\\n]/g;
 
-    # \_. — any character including newline
-    $perl =~ s/\\_./ /g;    # approximate with space — skip
+    # \_. -- any character including newline
+    $perl =~ s/\\_./ /g;    # approximate with space -- skip
 
-    # \i — identifier character [a-zA-Z0-9_]
+    # \i -- identifier character [a-zA-Z0-9_]
     $perl =~ s/\\i/[a-zA-Z0-9_]/g;
 
-    # \I — identifier character excluding digits [a-zA-Z_]
+    # \I -- identifier character excluding digits [a-zA-Z_]
     $perl =~ s/\\I/[a-zA-Z_]/g;
 
-    # \h — head of word [a-zA-Z_]
+    # \h -- head of word [a-zA-Z_]
     $perl =~ s/\\h/[a-zA-Z_]/g;
 
-    # \H — non-head [^a-zA-Z_]
+    # \H -- non-head [^a-zA-Z_]
     $perl =~ s/\\H/[^a-zA-Z_]/g;
 
-    # \a — alphabetic [a-zA-Z]
+    # \a -- alphabetic [a-zA-Z]
     $perl =~ s/\\a/[a-zA-Z]/g;
 
-    # \A — non-alphabetic [^a-zA-Z]
+    # \A -- non-alphabetic [^a-zA-Z]
     $perl =~ s/\\A/[^a-zA-Z]/g;
 
-    # \l — lowercase [a-z]
+    # \l -- lowercase [a-z]
     $perl =~ s/\\l/[a-z]/g;
 
-    # \L — non-lowercase [^a-z]
+    # \L -- non-lowercase [^a-z]
     $perl =~ s/\\L/[^a-z]/g;
 
-    # \u — uppercase [A-Z]
+    # \u -- uppercase [A-Z]
     $perl =~ s/\\u/[A-Z]/g;
 
-    # \U — non-uppercase [^A-Z]
+    # \U -- non-uppercase [^A-Z]
     $perl =~ s/\\U/[^A-Z]/g;
 
-    # \o — octal digit [0-7]
+    # \o -- octal digit [0-7]
     $perl =~ s/\\o/[0-7]/g;
 
-    # \x — hex digit [0-9a-fA-F]
+    # \x -- hex digit [0-9a-fA-F]
     $perl =~ s/\\x(?!\{)/[0-9a-fA-F]/g;
 
-    # \p — printable character (only if not followed by { which is Unicode property)
+    # \p -- printable character (only if not followed by { which is Unicode property)
     $perl =~ s/\\p(?!\{)/[[:print:]]/g;
-    # Also handle \p\{ (Vim multi) → [[:print:]]{
+    # Also handle \p\{ (Vim multi) -> [[:print:]]{
     $perl =~ s/\\p\\\{/[[:print:]]{/g;
     $perl =~ s/\\P\\\{/[^[:print:]]{/g;
 
-    # \~ — last substitute string — skip
+    # \~ -- last substitute string -- skip
     $perl =~ s/\\~//g;
 
     # \%(...\) already handled above
     # \%(  already handled
 
-    # Vim \{n,m} quantifiers — already valid in Perl as {n,m}
+    # Vim \{n,m} quantifiers -- already valid in Perl as {n,m}
     # but Vim uses \{n,m} while Perl uses {n,m}
-    # Handle \{-} (Vim non-greedy zero-or-more) → *? (Perl non-greedy)
+    # Handle \{-} (Vim non-greedy zero-or-more) -> *? (Perl non-greedy)
     $perl =~ s/\\\{-}/ *?/g;
-    # Handle \{-\d+,} etc. — approximate with *?
+    # Handle \{-\d+,} etc. -- approximate with *?
     $perl =~ s/\\\{-\d+,\}/ *?/g;
     $perl =~ s/\\\{-\d+,\d+\}/ *?/g;
-    # Handle \{n,m} → {n,m}
+    # Handle \{n,m} -> {n,m}
     $perl =~ s/\\\{(\d+),(\d+)\}/{$1,$2}/g;
     $perl =~ s/\\\{(\d+),\}/{$1,}/g;
     $perl =~ s/\\\{(\d+)\}/{$1}/g;
     $perl =~ s/\\\{/\{/g;
     $perl =~ s/\\\}/\}/g;
 
-    # \= — optional (0 or 1) — Perl uses ?
+    # \= -- optional (0 or 1) -- Perl uses ?
     $perl =~ s/\\=/\?/g;
 
-    # \+ — one or more — already valid in Perl
+    # \+ -- one or more -- already valid in Perl
     $perl =~ s/\\\+/\+/g;
 
-    # Remove Vim-specific flags at end like \c (case insensitive) — handle separately
+    # Remove Vim-specific flags at end like \c (case insensitive) -- handle separately
     $perl =~ s/\\c//g;
     $perl =~ s/\\C//g;
 
@@ -954,7 +954,7 @@ sub _vim_to_perl_regex
 
 #===========================================================================
 # Extract keywords from a Vim alternation pattern
-#   \<\%(word1\|word2\|...\)\>  →  (word1, word2, ...)
+#   \<\%(word1\|word2\|...\)\>  ->  (word1, word2, ...)
 #===========================================================================
 
 sub _extract_keyword_alternation
@@ -962,7 +962,7 @@ sub _extract_keyword_alternation
     my ($pattern) = @_;
 
     # Match: \<\%(word1\|word2\|...\)\>
-    # After Vim→Perl conversion this would be: \b(?:word1|word2|...)\b
+    # After Vim->Perl conversion this would be: \b(?:word1|word2|...)\b
     # But we check the Vim pattern before conversion
 
     if ($pattern =~ /^\\<\\%\(((?:\w+(?:\\\|)?)+)\\\)\\>$/)
@@ -991,7 +991,7 @@ sub _pattern_is_too_broad
 {
     my ($pattern) = @_;
 
-    # Patterns that match any identifier (too broad — use keywords instead)
+    # Patterns that match any identifier (too broad -- use keywords instead)
     return 1 if $pattern =~ /^\[a-zA-Z_\]\\w\*$/;
     return 1 if $pattern =~ /^\[a-zA-Z_\]\[a-zA-Z0-9_\]\*$/;
     return 1 if $pattern =~ /^\\w\+$/;
@@ -1016,7 +1016,7 @@ sub _pattern_is_too_broad
     return 1 if $pattern =~ /^\\S\+$/;
     return 1 if $pattern =~ /^\\S\*$/;
 
-    # Reject patterns that start with | (can match empty string → infinite loop)
+    # Reject patterns that start with | (can match empty string -> infinite loop)
     return 1 if $pattern =~ /^\|/;
 
     # Reject patterns containing Perl special chars that may cause issues
@@ -1162,13 +1162,13 @@ The converter extracts:
 
 =over 4
 
-=item * C<syn keyword> statements → C<[keyword:GROUP]> sections
+=item * C<syn keyword> statements -> C<[keyword:GROUP]> sections
 
-=item * C<syn match> statements → C<[match:GROUP]> sections
+=item * C<syn match> statements -> C<[match:GROUP]> sections
 
-=item * C<syn region> statements → C<[region:GROUP]> sections
+=item * C<syn region> statements -> C<[region:GROUP]> sections
 
-=item * C<hi def link> statements → group resolution map
+=item * C<hi def link> statements -> group resolution map
 
 =back
 

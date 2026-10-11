@@ -10,7 +10,7 @@ use Syntax::Highlight::Basic::Parser;
 use Syntax::Highlight::Basic::Output::Ansi;
 
 #===========================================================================
-# Output::Ansi Tests — ANSI 256-color terminal rendering
+# Output::Ansi Tests -- ANSI 256-color terminal rendering
 #===========================================================================
 
 # ANSI escape helpers (chr-based to survive tool pipeline)
@@ -65,7 +65,7 @@ sub convert_line {
 }
 
 #===========================================================================
-# Basic convert() — keyword gets ANSI codes
+# Basic convert() -- keyword gets ANSI codes
 #===========================================================================
 
 {
@@ -165,7 +165,7 @@ sub convert_line {
 
 {
     my $str = convert_line('python', 'def foo():');
-    # Count ESC[0m occurrences — should have one per styled token
+    # Count ESC[0m occurrences -- should have one per styled token
     my @resets = ($str =~ /\Q${ESC}[0m\E/g);
     cmp_ok(scalar @resets, '>=', 1, 'output contains reset codes');
 }
